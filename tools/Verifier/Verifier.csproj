@@ -7,6 +7,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\DynamicCampaignJapanese.csproj" />
     <Reference Include="0Harmony" HintPath="$(SeaPowerDir)\BepInEx\core\0Harmony.dll" Private="true" />
+    <Reference Include="AnchorChain" HintPath="$(AnchorChainDir)\AnchorChain.dll" Private="true" />
+    <Reference Include="BepInEx" HintPath="$(SeaPowerDir)\BepInEx\core\BepInEx.dll" Private="true" />
     <Reference Include="Newtonsoft.Json" HintPath="$(SeaPowerDir)\Sea Power_Data\Managed\Newtonsoft.Json.dll" Private="true" />
   </ItemGroup>
 </Project>

@@ -10,12 +10,17 @@ public static class CachedDisplayTranslations
     private const BindingFlags Static = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
     private const BindingFlags Instance = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
-    public static int Apply(Assembly assembly, TranslationCatalog catalog)
+    public static int Apply(Assembly assembly, TranslationCatalog catalog, Action<string>? logWarning = null)
     {
         var changed = 0;
         foreach (var entry in catalog.Methods.Where(pair => pair.Key.EndsWith("::.cctor()", StringComparison.Ordinal)))
         {
-            var type = assembly.GetType(entry.Key.Substring(0, entry.Key.Length - "::.cctor()".Length), true)!;
+            var type = assembly.GetType(entry.Key.Substring(0, entry.Key.Length - "::.cctor()".Length));
+            if (type == null)
+            {
+                logWarning?.Invoke("Cached translation type not found; skipped: " + entry.Key);
+                continue;
+            }
             foreach (var field in type.GetFields(Static | BindingFlags.DeclaredOnly))
             {
                 var value = field.GetValue(null);

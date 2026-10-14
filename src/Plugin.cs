@@ -9,7 +9,7 @@ using HarmonyLib;
 namespace DynamicCampaignJapanese;
 
 [ACPlugin(Plugin.ModId, "Dynamic Campaign Japanese", "2.0.0", new[] { "dynamiccampaignmod" }, new string[0])]
-[ACDependency("dynamiccampaignmod", "0.24.3", "0.24.4")]
+[ACDependency("dynamiccampaignmod", null, null)]
 public sealed class Plugin : IAnchorChainMod
 {
     public const string ModId = "mebiustos.bungalowdynamiccampaign.ja";
@@ -32,7 +32,12 @@ public sealed class Plugin : IAnchorChainMod
                 Log.LogInfo("Japanese localization is disabled in the mod manager.");
                 return;
             }
-            var original = AppDomain.CurrentDomain.GetAssemblies().Single(assembly => assembly.GetName().Name == "DynamicCampaignMod");
+            var original = AppDomain.CurrentDomain.GetAssemblies().SingleOrDefault(assembly => assembly.GetName().Name == "DynamicCampaignMod");
+            if (original == null)
+            {
+                Log.LogError("The original Dynamic Campaign assembly was not found.");
+                return;
+            }
             if (!Enabled(Path.GetDirectoryName(original.Location)!))
             {
                 Log.LogInfo("The original Dynamic Campaign mod is disabled.");
@@ -40,12 +45,15 @@ public sealed class Plugin : IAnchorChainMod
             }
             var catalog = TranslationCatalog.Load(Path.Combine(package, "translation-data.json"));
             integration = new OriginalModIntegration(catalog);
-            integration.Plan(original);
             originalAssembly = original;
             harmony = new Harmony(ModId);
-            var deferred = original.GetType("DynamicCampaignMod.DeferredPatcher", true)!;
-            var ready = deferred.GetMethod("Patch", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static)
-                ?? throw new MissingMethodException(deferred.FullName, "Patch");
+            var deferred = original.GetType("DynamicCampaignMod.DeferredPatcher");
+            var ready = deferred?.GetMethod("Patch", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
+            if (ready == null)
+            {
+                Log.LogWarning("The original mod's main-menu initialization hook was not found; Japanese localization was not scheduled.");
+                return;
+            }
             harmony.Patch(ready, postfix: new HarmonyMethod(typeof(Plugin).GetMethod(nameof(ApplyTranslations), BindingFlags.NonPublic | BindingFlags.Static)));
             scheduled = true;
             Log.LogInfo("Japanese localization is scheduled after the original mod's main-menu initialization.");
@@ -53,7 +61,6 @@ public sealed class Plugin : IAnchorChainMod
         catch (Exception error)
         {
             Log.LogError("Japanese localization initialization failed: " + error);
-            throw;
         }
     }
 
@@ -62,14 +69,13 @@ public sealed class Plugin : IAnchorChainMod
         if (installed) return;
         try
         {
-            var count = integration!.Install(originalAssembly!, harmony!);
+            var count = integration!.Install(originalAssembly!, harmony!, message => Log.LogWarning(message));
             installed = true;
             Log.LogInfo("Independent Japanese localization 2.0.0 active for " + originalAssembly!.GetName().Version + "; methods=" + count);
         }
         catch (Exception error)
         {
             Log.LogError("Japanese localization application failed: " + error);
-            throw;
         }
     }
 

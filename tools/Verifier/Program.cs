@@ -25,6 +25,7 @@ internal static class Program
             if (arguments.Length != 1) throw new ArgumentException("Pass the project directory.");
             var root = Path.GetFullPath(arguments[0]);
             AssemblyLoadContext.Default.Resolving += ResolveGameAssembly;
+            var startupChecks = CompatibilityChecks.VerifyStartup(Errors);
             var activationChecks = VerifyModActivation();
             var catalog = TranslationCatalog.Load(Path.Combine(root, "localization", "translation-data.json"));
             var integration = new OriginalModIntegration(catalog);
@@ -119,6 +120,7 @@ internal static class Program
                 });
             }
             if (saves.Count == 0) Errors.Add("No existing save was checked.");
+            var compatibilityChecks = CompatibilityChecks.VerifyPartialTranslation(root, Errors);
 
             var report = new JObject
             {
@@ -129,6 +131,8 @@ internal static class Program
                 ["bindings"] = bindings, ["saves"] = saves, ["gameRenderingTested"] = false
             };
             report["modActivationChecks"] = activationChecks;
+            report["startupChecks"] = startupChecks;
+            report["compatibilityChecks"] = compatibilityChecks;
             File.WriteAllText(Path.Combine(root, "artifacts", "verification-report.json"), report.ToString(Formatting.Indented));
             Console.WriteLine(report.ToString(Formatting.None));
             return Errors.Count == 0 ? 0 : 1;

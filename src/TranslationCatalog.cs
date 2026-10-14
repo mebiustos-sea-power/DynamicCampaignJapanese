@@ -8,7 +8,6 @@ namespace DynamicCampaignJapanese;
 
 public sealed class TranslationCatalog
 {
-    public Version OriginalVersion { get; }
     public IReadOnlyDictionary<string, string> Strings { get; }
     public IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> Methods { get; }
     public IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> Campaign { get; }
@@ -16,7 +15,6 @@ public sealed class TranslationCatalog
     private TranslationCatalog(JObject data)
     {
         if ((int?)data["format"] != 1) throw new InvalidDataException("Unsupported translation-data format.");
-        OriginalVersion = Version.Parse((string?)data["originalModVersion"] ?? throw new InvalidDataException("Original mod version is missing."));
         Strings = Dictionary(Required(data, "strings"));
         Methods = Groups(Required(data, "methods"));
         Campaign = Groups(Required(data, "campaign"));

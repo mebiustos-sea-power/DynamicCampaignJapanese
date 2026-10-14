@@ -26,10 +26,8 @@ public sealed class OriginalModIntegration
         campaign = new CampaignTranslator(catalog);
     }
 
-    public IReadOnlyList<MethodBase> Plan(Assembly assembly)
+    public IReadOnlyList<MethodBase> Plan(Assembly assembly, Action<string>? logWarning = null)
     {
-        if (assembly.GetName().Name != "DynamicCampaignMod" || assembly.GetName().Version != catalog.OriginalVersion)
-            throw new InvalidOperationException("Unsupported Dynamic Campaign assembly: " + assembly.GetName());
         var index = assembly.GetTypes().SelectMany(type =>
             type.GetMethods(Declared).Cast<MethodBase>().Concat(type.GetConstructors(Declared)))
             .Where(method => method.GetMethodBody() != null).ToDictionary(MethodIdentity.Of, StringComparer.Ordinal);
@@ -37,14 +35,16 @@ public sealed class OriginalModIntegration
         {
             XamlLoad, XamlParse, CampaignLoad
         };
-        foreach (var signature in signatures)
-            if (!index.ContainsKey(signature)) throw new MissingMethodException("Translation target not found: " + signature);
-        return signatures.OrderBy(value => value, StringComparer.Ordinal).Select(signature => index[signature]).ToArray();
+        var plan = new List<MethodBase>();
+        foreach (var signature in signatures.OrderBy(value => value, StringComparer.Ordinal))
+            if (index.TryGetValue(signature, out var method)) plan.Add(method);
+            else logWarning?.Invoke("Translation target not found; skipped: " + signature);
+        return plan;
     }
 
-    public int Install(Assembly assembly, Harmony harmony)
+    public int Install(Assembly assembly, Harmony harmony, Action<string>? logWarning = null)
     {
-        var plan = Plan(assembly);
+        var plan = Plan(assembly, logWarning);
         current = this;
         var transpiler = new HarmonyMethod(typeof(OriginalModIntegration).GetMethod(nameof(TranspileCurrent)));
         var patched = 0;
@@ -57,7 +57,7 @@ public sealed class OriginalModIntegration
                 catch (Exception error) { throw new InvalidOperationException("Cannot apply Japanese translation to " + MethodIdentity.Of(method), error); }
                 patched++;
             }
-            CachedDisplayTranslations.Apply(assembly, catalog);
+            CachedDisplayTranslations.Apply(assembly, catalog, logWarning);
             return patched;
         }
         catch (Exception error)
