@@ -49,7 +49,7 @@
     "Ship fuel ": "艦船用燃料 ",
     "Aviation fuel ": "航空燃料 ",
     "No weapons in stock.": "弾薬の備蓄はありません。",
-    "New task force from selected": "選択した艦艇で新しい任務部隊を編成",
+    "New task force from selected": "選択した艦艇で任務部隊を新設",
     "Move the selected ships to": "選択した艦艇の移動先",
     "Move": "移動",
     "OUR LOSSES": "我が軍の損失",
@@ -1139,7 +1139,7 @@
     "{0} · {1} of {2} ready": "{0} · {1}/{2} が準備完了",
     "Aircraft in the squadron": "飛行隊の航空機",
     "{0} ship{1} selected": "{0}隻{1}を選択",
-    "Tick ships to form a new task force or move them to another.": "船にチェックを入れて新しい任務部隊を結成するか、別の任務部隊に移動させます。",
+    "Tick ships to form a new task force or move them to another.": "艦艇を選択してから、任務部隊を新設するか、別の部隊へ移動。",
     "Tick the ships for the new task force first.": "まず新しい任務部隊の船にチェックを入れてください。",
     "{0} formed with {1} ships.": "{0}を{1}隻で編成しました。",
     "Ships can only change task force in the same port.": "船舶は同じ港内でのみ任務部隊を変更できます。",
@@ -5265,7 +5265,7 @@
     "DynamicCampaignMod.UI.Base.BaseScreenViewModel::SelectionChanged()": {
       "{0} ship{1} selected": "{0}隻{1}を選択",
       "s": "",
-      "Tick ships to form a new task force or move them to another.": "船にチェックを入れて新しい任務部隊を結成するか、別の任務部隊に移動させます。"
+      "Tick ships to form a new task force or move them to another.": "艦艇を選択してから、任務部隊を新設するか、別の部隊へ移動。"
     },
     "DynamicCampaignMod.UI.Base.BaseScreenViewModel::UpdateMoveTargets()": {
       "New task force": "新しい任務部隊"
