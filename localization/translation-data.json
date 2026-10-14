@@ -3478,17 +3478,17 @@
       "Task force panel": "任務部隊パネル"
     },
     "DynamicCampaignMod.UI.Strategy.FleetViewModel::Fill(DynamicCampaignMod.UI.Strategy.FleetGroupRow)": {
-      "In port, ": "港で、 ",
-      "At sea, holding": "洋上、待機中",
+      "In port, ": "港（",
+      "At sea, holding": "洋上 · 待機中",
       "waypoint": "経由点",
       "to ": "行先： ",
-      "At sea, ": "洋上、 ",
-      "{0:0} kn": "{0:0} ノット",
-      "{0:0} kn (out of fuel)": "{0:0} ノット (燃料切れ)"
+      "At sea, ": "洋上 · ",
+      "{0:0} kn": "{0:0}ノット",
+      "{0:0} kn (out of fuel)": "{0:0}ノット（燃料切れ）"
     },
     "DynamicCampaignMod.UI.Strategy.FleetViewModel::Supply(DynamicCampaignMod.Core.State.TaskForce)": {
-      " · supplying, about {0:0} h more": "・補給中、残り約{0:0}時間",
-      " · ready": " · 準備完了"
+      " · supplying, about {0:0} h more": "） · 補給中（残り約{0:0}時間）",
+      " · ready": "） · 準備完了"
     },
     "DynamicCampaignMod.UI.Strategy.FleetViewModel::Fill(DynamicCampaignMod.UI.Strategy.FleetShipRow)": {
       "nuclear": "原子力",

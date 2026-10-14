@@ -17,6 +17,13 @@ internal static class ContextualMessageChecks
     private static readonly Dictionary<(string Method, string Literal), string> ApprovedChanges = new()
     {
         [("DynamicCampaignMod.UI.Base.BaseScreenViewModel::SelectionChanged()", "Tick ships to form a new task force or move them to another.")] = Footer,
+        [("DynamicCampaignMod.UI.Strategy.FleetViewModel::Fill(DynamicCampaignMod.UI.Strategy.FleetGroupRow)", "In port, ")] = "港（",
+        [("DynamicCampaignMod.UI.Strategy.FleetViewModel::Fill(DynamicCampaignMod.UI.Strategy.FleetGroupRow)", "At sea, holding")] = "洋上 · 待機中",
+        [("DynamicCampaignMod.UI.Strategy.FleetViewModel::Fill(DynamicCampaignMod.UI.Strategy.FleetGroupRow)", "At sea, ")] = "洋上 · ",
+        [("DynamicCampaignMod.UI.Strategy.FleetViewModel::Fill(DynamicCampaignMod.UI.Strategy.FleetGroupRow)", "{0:0} kn")] = "{0:0}ノット",
+        [("DynamicCampaignMod.UI.Strategy.FleetViewModel::Fill(DynamicCampaignMod.UI.Strategy.FleetGroupRow)", "{0:0} kn (out of fuel)")] = "{0:0}ノット（燃料切れ）",
+        [("DynamicCampaignMod.UI.Strategy.FleetViewModel::Supply(DynamicCampaignMod.Core.State.TaskForce)", " · supplying, about {0:0} h more")] = "） · 補給中（残り約{0:0}時間）",
+        [("DynamicCampaignMod.UI.Strategy.FleetViewModel::Supply(DynamicCampaignMod.Core.State.TaskForce)", " · ready")] = "） · 準備完了",
         [("DynamicCampaignMod.UI.Strategy.ProcurementViewModel::Card(DynamicCampaignMod.Core.Data.CatalogueEntry)", "at ")] = "解放階級：",
         [("DynamicCampaignMod.UI.Strategy.ProcurementViewModel::RefreshDetail()", "at ")] = "解放階級：",
         [("DynamicCampaignMod.UI.Strategy.ProcurementViewModel/<>c__DisplayClass132_0::<Group>b__2(System.Linq.IGrouping`2<System.Int32,DynamicCampaignMod.Core.Data.CatalogueEntry>)", "At ")] = "解放階級：",
