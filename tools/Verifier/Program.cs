@@ -49,7 +49,7 @@ internal static class Program
             Directory.CreateDirectory(Path.Combine(root, "artifacts", "xaml-generated"));
             foreach (var resource in resources)
             {
-                var expected = (string)resource["Translated"]!;
+                var expected = ContextualMessageChecks.ExpectedMarkup((string)resource["Name"]!, (string)resource["Translated"]!);
                 var actual = markup.Translate((string)resource["Original"]!);
                 File.WriteAllText(Path.Combine(root, "artifacts", "xaml-generated", (string)resource["Name"]!), actual);
                 var left = System.Xml.Linq.XDocument.Parse(expected);
@@ -74,7 +74,13 @@ internal static class Program
                 var left = source.Select(instruction => new CodeInstruction(instruction)).ToList();
                 var right = source.Select(instruction => new CodeInstruction(instruction)).ToList();
                 var expected = ((IEnumerable<CodeInstruction>)oldTranspiler.Invoke(null, new object[] { left, method })!).ToArray();
+                expected = ContextualMessageChecks.ExpectedInstructions(method, source, expected);
                 var actual = integration.TranslateInstructions(right, method).ToArray();
+                if (MethodIdentity.Of(method) == AircraftMessageTranslation.Target)
+                {
+                    expected = ContextualMessageChecks.NormalizeAircraftMessage(expected, false);
+                    actual = ContextualMessageChecks.NormalizeAircraftMessage(actual, true);
+                }
                 if (expected.Length != actual.Length)
                 {
                     Errors.Add("Instruction count mismatch: " + MethodIdentity.Of(method));
@@ -130,6 +136,7 @@ internal static class Program
                 });
             }
             if (saves.Count == 0) Errors.Add("No existing save was checked.");
+            var contextualMessages = ContextualMessageChecks.VerifyAircraft(original, integration, catalog, Errors);
             var compatibilityChecks = CompatibilityChecks.VerifyPartialTranslation(root, Errors);
 
             var report = new JObject
@@ -144,6 +151,7 @@ internal static class Program
             report["startupChecks"] = startupChecks;
             report["compatibilityChecks"] = compatibilityChecks;
             report["shipDisplayChecks"] = shipDisplays;
+            report["contextualMessageChecks"] = contextualMessages;
             File.WriteAllText(Path.Combine(root, "artifacts", "verification-report.json"), report.ToString(Formatting.Indented));
             Console.WriteLine(report.ToString(Formatting.None));
             return Errors.Count == 0 ? 0 : 1;

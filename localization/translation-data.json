@@ -4176,7 +4176,7 @@
       "{0:N0} pts": "{0:N0} ポイント",
       "{0:N0} pts each": "各 {0:N0} ポイント",
       "{0:0} days": "{0:0} 日",
-      "at ": "で ",
+      "at ": "解放階級：",
       "AIR": "航空",
       "BN": "大隊",
       "Select class": "艦級を選択"
@@ -4215,7 +4215,7 @@
       "select its group, right-click another of your groups at sea: Replenish (or select the other group, right-click its group: Replenish from)": "部隊を選び、他の洋上味方部隊を右クリックして「補給」。受給側から補給艦の部隊を右クリックして「補給を受ける」でも可能です。",
       " · in service": "・就役中",
       " · +{0} pts": " · +{0} ポイント",
-      "at ": "で ",
+      "at ": "解放階級：",
       "Choose loadout": "兵装を選択してください",
       "Role": "役割",
       "Loadouts": "兵装",
@@ -4243,7 +4243,7 @@
       "Cancelled: {0}, {1:N0} points back.": "取消：{0}、{1:N0}ポイントを返還しました。"
     },
     "DynamicCampaignMod.UI.Strategy.ProcurementViewModel/<>c__DisplayClass132_0::<Group>b__2(System.Linq.IGrouping`2<System.Int32,DynamicCampaignMod.Core.Data.CatalogueEntry>)": {
-      "At ": "で ",
+      "At ": "解放階級：",
       "Unlocked": "解放済み"
     },
     "DynamicCampaignMod.UI.Strategy.ProcurementViewModel/<>c__DisplayClass162_0::<RefreshDetail>b__3(System.Int32)": {
@@ -5929,8 +5929,7 @@
       "Not one of our airfields.": "私たちの飛行場ではありません。",
       "Nothing to keep armed.": "武装しておくべきものは何もない。",
       "That aircraft can't stand alert in that loadout.": "その機体はこの兵装で警戒待機できません。",
-      "No ": "なし： ",
-      " at ": " で "
+      "No {0} at {1}.": "{1}に{0}なし。"
     },
     "DynamicCampaignMod.Core.Sim.AlertLines::TopUp(DynamicCampaignMod.Core.State.AlertLine)": {
       "short of ": "不足 ",
@@ -7347,7 +7346,7 @@
       "no losses on either side": "どちらの側にも損失はありません",
       "last action": "直近の戦闘",
       "Our last action, ": "直近の戦闘： ",
-      " at ": " で ",
+      " at ": "／",
       "This follows the action of ": "先行した戦闘： ",
       ", which ": "、 "
     },
@@ -7416,7 +7415,7 @@
       "Contact reports by FLASH precedence; losses and battle damage by IMMEDIATE.": "接触報告は至急、損失と戦闘損傷は緊急の優先度で報告せよ。"
     },
     "DynamicCampaignMod.Core.Sim.Story/<>c__DisplayClass17_0::<BuildOpening>g__Place|11(DynamicCampaignMod.Core.State.TaskForce)": {
-      "at ": "で ",
+      "at ": "所在：",
       "at sea, ": "洋上、 "
     },
     "DynamicCampaignMod.Core.Sim.Story/<>c__DisplayClass17_0::<BuildOpening>b__21(System.Linq.IGrouping`2<System.String,DynamicCampaignMod.Core.State.GroundUnit>)": {

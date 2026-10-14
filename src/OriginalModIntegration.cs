@@ -18,6 +18,7 @@ public sealed class OriginalModIntegration
     private readonly TranslationCatalog catalog;
     private readonly MarkupTranslator markup;
     private readonly CampaignTranslator campaign;
+    private Action<string>? logWarning;
 
     public OriginalModIntegration(TranslationCatalog catalog)
     {
@@ -45,6 +46,7 @@ public sealed class OriginalModIntegration
     public int Install(Assembly assembly, Harmony harmony, Action<string>? logWarning = null)
     {
         var plan = Plan(assembly, logWarning);
+        this.logWarning = logWarning;
         current = this;
         var transpiler = new HarmonyMethod(typeof(OriginalModIntegration).GetMethod(nameof(TranspileCurrent)));
         var patched = 0;
@@ -75,7 +77,7 @@ public sealed class OriginalModIntegration
         catalog.Methods.TryGetValue(identity, out var literals);
         var isMarkup = identity == XamlLoad || identity == XamlParse;
         var isCampaign = identity == CampaignLoad;
-        foreach (var source in instructions)
+        foreach (var source in AircraftMessageTranslation.TranslateInstructions(instructions, original, catalog, logWarning))
         {
             var instruction = new CodeInstruction(source);
             if (instruction.opcode == OpCodes.Ldstr && instruction.operand is string text &&
@@ -99,6 +101,9 @@ public sealed class OriginalModIntegration
     {
         return Active().TranslateInstructions(instructions, __originalMethod);
     }
+
+    public static string MissingAircraft(string aircraftName, string baseName) =>
+        string.Format(Active().catalog.Methods[AircraftMessageTranslation.Target][AircraftMessageTranslation.Template], aircraftName, baseName);
 
     public static string TranslateMarkup(string value) => Active().markup.Translate(value);
     public static string ReadCampaign(string path) => Active().campaign.Translate(File.ReadAllText(path));
