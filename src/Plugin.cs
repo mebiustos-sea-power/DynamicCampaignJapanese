@@ -72,6 +72,18 @@ public sealed class Plugin : IAnchorChainMod
             var count = integration!.Install(originalAssembly!, harmony!, message => Log.LogWarning(message));
             installed = true;
             Log.LogInfo("Independent Japanese localization 2.0.0 active for " + originalAssembly!.GetName().Version + "; methods=" + count);
+            try
+            {
+                var game = AppDomain.CurrentDomain.GetAssemblies().Single(assembly => assembly.GetName().Name == "Seapower-Scripts");
+                var shipNames = GameShipNames.Load(game, message => Log.LogWarning(message));
+                var displays = new ShipDisplayIntegration(originalAssembly!, shipNames.Translations, () => shipNames.NatoNames);
+                var shipCount = displays.Install(originalAssembly!, harmony!, message => Log.LogWarning(message), message => Log.LogError(message));
+                Log.LogInfo("Japanese ship-name display translation active; units=" + shipNames.Translations.UnitCount + "; methods=" + shipCount);
+            }
+            catch (Exception error)
+            {
+                Log.LogError("Japanese ship-name display initialization failed: " + error);
+            }
         }
         catch (Exception error)
         {

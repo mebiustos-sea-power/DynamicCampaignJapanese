@@ -30,6 +30,9 @@ internal static class Program
             var catalog = TranslationCatalog.Load(Path.Combine(root, "localization", "translation-data.json"));
             var integration = new OriginalModIntegration(catalog);
             var original = AssemblyLoadContext.Default.LoadFromAssemblyPath(@"N:\Games\Steam\steamapps\workshop\content\1286220\3813157776\DynamicCampaignMod.dll");
+            var gameAssembly = AppDomain.CurrentDomain.GetAssemblies().Single(assembly => assembly.GetName().Name == "Seapower-Scripts");
+            var shipNames = ShipNameChecks.LoadSource(Game, gameAssembly, Errors);
+            var shipDisplays = ShipNameChecks.VerifyDisplay(shipNames.Translations, original, Errors);
             var oldAssembly = Assembly.LoadFile(Path.Combine(root, "artifacts", "baseline", "installed-package", "DynamicCampaignJapanese.dll"));
             AssemblyLoadContext.GetLoadContext(oldAssembly)!.Resolving += ResolveGameAssembly;
             var legacy = oldAssembly.GetType("BungalowChinese.Runtime", true)!;
@@ -112,11 +115,13 @@ internal static class Program
                 var args = new object?[] { File.ReadAllText(file), definition, null, null };
                 var state = readSave.Invoke(null, args);
                 if (state == null || args[3] != null) Errors.Add("Save failed to load: " + Path.GetFileName(file) + " / " + args[3]);
+                var shipSaveCheck = state == null ? null : ShipNameChecks.VerifySave(original, state, args[2], shipNames.Translations, Errors);
                 saves.Add(new JObject
                 {
                     ["name"] = Path.GetFileName(file), ["loaded"] = state != null, ["error"] = args[3]?.ToString(),
                     ["taskForces"] = state == null ? 0 : ((ICollection)state.GetType().GetField("TaskForces")!.GetValue(state)!).Count,
-                    ["campaignId"] = definitionType.GetProperty("Id")!.GetValue(definition)!.ToString()
+                    ["campaignId"] = definitionType.GetProperty("Id")!.GetValue(definition)!.ToString(),
+                    ["shipDisplayChecks"] = shipSaveCheck
                 });
             }
             if (saves.Count == 0) Errors.Add("No existing save was checked.");
@@ -133,6 +138,7 @@ internal static class Program
             report["modActivationChecks"] = activationChecks;
             report["startupChecks"] = startupChecks;
             report["compatibilityChecks"] = compatibilityChecks;
+            report["shipDisplayChecks"] = shipDisplays;
             File.WriteAllText(Path.Combine(root, "artifacts", "verification-report.json"), report.ToString(Formatting.Indented));
             Console.WriteLine(report.ToString(Formatting.None));
             return Errors.Count == 0 ? 0 : 1;
