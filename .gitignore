@@ -10,3 +10,4 @@ __pycache__/
 *.exe
 *.zip
 *.nupkg
+/Directory.Build.local.props

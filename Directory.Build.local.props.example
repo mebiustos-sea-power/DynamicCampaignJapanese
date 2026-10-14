@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <SeaPowerDir Condition="'$(SeaPowerDir)' == ''">C:\path\to\Sea Power</SeaPowerDir>
+    <AnchorChainDir Condition="'$(AnchorChainDir)' == ''">C:\path\to\Anchor Chain</AnchorChainDir>
+    <OriginalModDir Condition="'$(OriginalModDir)' == ''">C:\path\to\Dynamic Campaign</OriginalModDir>
+  </PropertyGroup>
+</Project>

@@ -13,7 +13,8 @@ using Newtonsoft.Json.Linq;
 
 internal static class Program
 {
-    private const string Game = @"N:\Games\Steam\steamapps\common\Sea Power";
+    private static string Game = null!;
+    private static string AnchorChainDirectory = null!;
     private const BindingFlags All = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
     private static readonly List<string> Errors = new();
 
@@ -22,22 +23,26 @@ internal static class Program
         Console.OutputEncoding = new System.Text.UTF8Encoding(false);
         try
         {
-            if (arguments.Length != 1) throw new ArgumentException("Pass the project directory.");
+            if (arguments.Length != 5) throw new ArgumentException("Pass the project, Sea Power, Anchor Chain, original mod and baseline directories.");
             var root = Path.GetFullPath(arguments[0]);
+            Game = Path.GetFullPath(arguments[1]);
+            AnchorChainDirectory = Path.GetFullPath(arguments[2]);
+            var originalDirectory = Path.GetFullPath(arguments[3]);
+            var baselineDirectory = Path.GetFullPath(arguments[4]);
             AssemblyLoadContext.Default.Resolving += ResolveGameAssembly;
             var startupChecks = CompatibilityChecks.VerifyStartup(Errors);
             var activationChecks = VerifyModActivation();
             var catalog = TranslationCatalog.Load(Path.Combine(root, "localization", "translation-data.json"));
             var integration = new OriginalModIntegration(catalog);
-            var original = AssemblyLoadContext.Default.LoadFromAssemblyPath(@"N:\Games\Steam\steamapps\workshop\content\1286220\3813157776\DynamicCampaignMod.dll");
+            var original = AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.Combine(originalDirectory, "DynamicCampaignMod.dll"));
             var gameAssembly = AppDomain.CurrentDomain.GetAssemblies().Single(assembly => assembly.GetName().Name == "Seapower-Scripts");
             var shipNames = ShipNameChecks.LoadSource(Game, gameAssembly, Errors);
             var shipDisplays = ShipNameChecks.VerifyDisplay(shipNames.Translations, original, Errors);
-            var oldAssembly = Assembly.LoadFile(Path.Combine(root, "artifacts", "baseline", "installed-package", "DynamicCampaignJapanese.dll"));
+            var oldAssembly = Assembly.LoadFile(Path.Combine(baselineDirectory, "installed-package", "DynamicCampaignJapanese.dll"));
             AssemblyLoadContext.GetLoadContext(oldAssembly)!.Resolving += ResolveGameAssembly;
             var legacy = oldAssembly.GetType("BungalowChinese.Runtime", true)!;
-            legacy.GetMethod("LoadData", All)!.Invoke(null, new object[] { Path.Combine(root, "artifacts", "baseline", "installed-package") });
-            var baseline = JObject.Parse(File.ReadAllText(Path.Combine(root, "artifacts", "baseline", "runtime-output.json")));
+            legacy.GetMethod("LoadData", All)!.Invoke(null, new object[] { Path.Combine(baselineDirectory, "installed-package") });
+            var baseline = JObject.Parse(File.ReadAllText(Path.Combine(baselineDirectory, "runtime-output.json")));
 
             var markup = new MarkupTranslator(catalog);
             var resources = (JArray)baseline["Resources"]!;
@@ -109,7 +114,7 @@ internal static class Program
             var definition = JsonConvert.DeserializeObject(campaign, definitionType)!;
             var readSave = original.GetType("DynamicCampaignMod.Core.State.CampaignSave", true)!.GetMethod("Read", All)!;
             var saves = new JArray();
-            foreach (var file in Directory.EnumerateFiles(Path.Combine(root, "artifacts", "baseline", "saves"), "*.json", SearchOption.AllDirectories))
+            foreach (var file in Directory.EnumerateFiles(Path.Combine(baselineDirectory, "saves"), "*.json", SearchOption.AllDirectories))
             {
                 if (file.EndsWith(".meta.json", StringComparison.Ordinal)) continue;
                 var args = new object?[] { File.ReadAllText(file), definition, null, null };
@@ -198,7 +203,7 @@ internal static class Program
     {
         var loaded = AssemblyLoadContext.Default.Assemblies.FirstOrDefault(assembly => assembly.GetName().Name == name.Name);
         if (loaded != null) return loaded;
-        foreach (var directory in new[] { Path.Combine(Game, "Sea Power_Data", "Managed"), Path.Combine(Game, "BepInEx", "core"), @"N:\Games\Steam\steamapps\workshop\content\1286220\3380210757" })
+        foreach (var directory in new[] { Path.Combine(Game, "Sea Power_Data", "Managed"), Path.Combine(Game, "BepInEx", "core"), AnchorChainDirectory })
         {
             var path = Path.Combine(directory, name.Name + ".dll");
             if (File.Exists(path)) return AssemblyLoadContext.Default.LoadFromAssemblyPath(path);

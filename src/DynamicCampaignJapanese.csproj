@@ -13,7 +13,11 @@
     <Reference Include="Newtonsoft.Json" HintPath="$(SeaPowerDir)\Sea Power_Data\Managed\Newtonsoft.Json.dll" Private="false" />
   </ItemGroup>
   <Target Name="CheckGameReferences" BeforeTargets="ResolveReferences">
-    <Error Condition="!Exists('$(AnchorChainDir)\AnchorChain.dll')" Text="Anchor Chain DLL not found. Set AnchorChainDir to its installed directory." />
-    <Error Condition="!Exists('$(SeaPowerDir)\BepInEx\core\0Harmony.dll')" Text="Harmony DLL not found. Set SeaPowerDir to the installed game directory." />
+    <Error Condition="'$(SeaPowerDir)' == ''" Text="Set SeaPowerDir in Directory.Build.local.props. Copy Directory.Build.local.props.example to get started." />
+    <Error Condition="'$(AnchorChainDir)' == ''" Text="Set AnchorChainDir in Directory.Build.local.props. Copy Directory.Build.local.props.example to get started." />
+    <Error Condition="!Exists('$(AnchorChainDir)\AnchorChain.dll')" Text="Anchor Chain DLL not found. Check AnchorChainDir in Directory.Build.local.props." />
+    <Error Condition="!Exists('$(SeaPowerDir)\BepInEx\core\0Harmony.dll')" Text="Harmony DLL not found. Check SeaPowerDir in Directory.Build.local.props." />
+    <Error Condition="!Exists('$(SeaPowerDir)\BepInEx\core\BepInEx.dll')" Text="BepInEx DLL not found. Check SeaPowerDir in Directory.Build.local.props." />
+    <Error Condition="!Exists('$(SeaPowerDir)\Sea Power_Data\Managed\Newtonsoft.Json.dll')" Text="Newtonsoft.Json DLL not found. Check SeaPowerDir in Directory.Build.local.props." />
   </Target>
 </Project>
