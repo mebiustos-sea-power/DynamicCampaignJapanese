@@ -1,0 +1,14 @@
+Dynamic Campaign Japanese Localization
+
+Original Dynamic Campaign and English campaign text: Bungalow
+https://steamcommunity.com/sharedfiles/filedetails/?id=3813157776
+
+Plugin loading framework: Anchor Chain, SeaPower-Modders
+https://github.com/SeaPower-Modders/AnchorChain
+
+Runtime patching library: Harmony, Andreas Pardeike and contributors
+https://github.com/pardeike/Harmony
+
+Japanese text was translated and reviewed against the original English.
+The Japanese localization DLL is independently implemented in this project.
+Game and framework DLLs are referenced from the user's installed environment and are not included in this package.

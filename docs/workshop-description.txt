@@ -1,0 +1,15 @@
+Dynamic Campaign Mod 日本語化
+
+「Bungalow's Dynamic Campaign」のキャンペーン文章やUI表示を日本語化するMODです。
+対応する元MODのバージョンは0.24.3です。一部の個艦名・艦級名は英語表記のままです。
+
+必要なMOD
+・Bungalow's Dynamic Campaign 0.24.3（作者：Bungalow）
+https://steamcommunity.com/sharedfiles/filedetails/?id=3813157776
+・Anchor Chain 1.1.0
+https://steamcommunity.com/sharedfiles/filedetails/?id=3380210757
+
+利用方法
+1. このMODと、上記の必要なMODをサブスクライブします。
+2. ダウンロード完了後、ゲームのMODマネージャーで日本語化MOD、Bungalow's Dynamic Campaign、Anchor Chainを有効にします。
+3. Sea Powerを完全に終了し、再起動します。

@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <Deterministic>true</Deterministic>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <SeaPowerDir Condition="'$(SeaPowerDir)' == ''">N:\Games\Steam\steamapps\common\Sea Power</SeaPowerDir>
+    <AnchorChainDir Condition="'$(AnchorChainDir)' == ''">N:\Games\Steam\steamapps\workshop\content\1286220\3380210757</AnchorChainDir>
+    <OriginalModDir Condition="'$(OriginalModDir)' == ''">N:\Games\Steam\steamapps\workshop\content\1286220\3813157776</OriginalModDir>
+  </PropertyGroup>
+</Project>
