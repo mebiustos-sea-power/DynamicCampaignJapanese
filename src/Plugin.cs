@@ -8,10 +8,12 @@ using HarmonyLib;
 
 namespace DynamicCampaignJapanese;
 
-[ACPlugin("local.bungalow.ja", "Dynamic Campaign Japanese", "2.0.0", new[] { "dynamiccampaignmod" }, new string[0])]
+[ACPlugin(Plugin.ModId, "Dynamic Campaign Japanese", "2.0.0", new[] { "dynamiccampaignmod" }, new string[0])]
 [ACDependency("dynamiccampaignmod", "0.24.3", "0.24.4")]
 public sealed class Plugin : IAnchorChainMod
 {
+    public const string ModId = "mebiustos.bungalowdynamiccampaign.ja";
+
     private static readonly ManualLogSource Log = Logger.CreateLogSource("Dynamic Campaign Japanese");
     private static bool installed;
     private static bool scheduled;
@@ -40,7 +42,7 @@ public sealed class Plugin : IAnchorChainMod
             integration = new OriginalModIntegration(catalog);
             integration.Plan(original);
             originalAssembly = original;
-            harmony = new Harmony("local.bungalow.ja");
+            harmony = new Harmony(ModId);
             var deferred = original.GetType("DynamicCampaignMod.DeferredPatcher", true)!;
             var ready = deferred.GetMethod("Patch", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static)
                 ?? throw new MissingMethodException(deferred.FullName, "Patch");
