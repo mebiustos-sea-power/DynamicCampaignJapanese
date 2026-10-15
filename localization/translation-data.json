@@ -1122,7 +1122,7 @@
     "Airlift on its way: loading at ": "到着待ち空輸、積込み基地： ",
     ", takes off ": "、離陸します ",
     "Airlift on its way to ": "空輸先： ",
-    " Transports kept here fly only as airlifts, on your order (Logistics panel, Airlifts tab).": " 輸送機は命令した空輸だけに使います。「兵站」の「空輸」で指定します。",
+    " Transports kept here fly only as airlifts, on your order (Logistics panel, Airlifts tab).": " 輸送機は空輸専用です。出撃は「兵站」の「空輸」で指示します。",
     "An air strike put the runway out of action: aircraft here take {0:0} times as long to arm and to turn round until then.": "航空攻撃で滑走路が停止し、この時刻まで武装・再出撃準備は通常の{0:0}倍かかります。",
     "{0} % of what it may hold": "基準備蓄の{0}%",
     " on its way, ": " 途中、 ",
@@ -1147,7 +1147,7 @@
     "{0} ship{1} moved to {2}.": "{0}隻{1}を{2}へ移しました。",
     " can't load: ": "は積込み不可： ",
     ": lost aircraft replaced.": ": 失われた航空機は交換されました。",
-    "{0}: {1} {2}, {3} ready.": "{0}: {1} {2}、{3} の準備ができました。",
+    "{0}: {1} {2}, {3} ready.": "{0}：{2} {1}機（出撃可能{3}機）。",
     "Transports loading": "輸送機の積込み中",
     "Numbers": "数量",
     "Info": "情報",
@@ -5223,7 +5223,7 @@
       "Airlift on its way to ": "空輸先： ",
       "arriving": "到着",
       "arrives ": "到着： ",
-      " Transports kept here fly only as airlifts, on your order (Logistics panel, Airlifts tab).": " 輸送機は命令した空輸だけに使います。「兵站」の「空輸」で指定します。"
+      " Transports kept here fly only as airlifts, on your order (Logistics panel, Airlifts tab).": " 輸送機は空輸専用です。出撃は「兵站」の「空輸」で指示します。"
     },
     "DynamicCampaignMod.UI.Base.BaseScreenViewModel::get_RunwayTip()": {
       "An air strike put the runway out of action: aircraft here take {0:0} times as long to arm and to turn round until then.": "航空攻撃で滑走路が停止し、この時刻まで武装・再出撃準備は通常の{0:0}倍かかります。"
@@ -5297,7 +5297,7 @@
       ": lost aircraft replaced.": ": 失われた航空機は交換されました。"
     },
     "DynamicCampaignMod.UI.Base.BaseScreenViewModel/<>c__DisplayClass33_0::<RefreshAirlift>b__4(DynamicCampaignMod.Core.State.Squadron)": {
-      "{0}: {1} {2}, {3} ready.": "{0}: {1} {2}、{3} の準備ができました。"
+      "{0}: {1} {2}, {3} ready.": "{0}：{2} {1}機（出撃可能{3}機）。"
     },
     "DynamicCampaignMod.UI.Base.BaseScreenViewModel/<>c__DisplayClass7_0::<.ctor>b__5()": {
       "Transports loading": "輸送機の積込み中"
