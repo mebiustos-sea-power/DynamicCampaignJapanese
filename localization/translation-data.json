@@ -1127,7 +1127,7 @@
     "{0} % of what it may hold": "基準備蓄の{0}%",
     " on its way, ": " 途中、 ",
     "No convoy on its way.": "到着待ち船団はありません。",
-    "{0} squadron{1}, {2} aircraft: {3} ready, {4} airborne": "{0}飛行隊{1}・{2}機：出撃可能{3}、飛行中{4}",
+    "{0} squadron{1}, {2} aircraft: {3} ready, {4} airborne": "{0}飛行隊{1}・{2}機：準備完了{3}、飛行中{4}",
     "No aircraft based here.": "ここに拠点を置く航空機はありません。",
     "supplying, about {0:0} h more": "供給中、あと約 {0:0} 時間",
     "{0} ship{1} · {2:0} kn · {3}": "{0} 船{1} · {2:0} ノット · {3}",
@@ -1147,7 +1147,7 @@
     "{0} ship{1} moved to {2}.": "{0}隻{1}を{2}へ移しました。",
     " can't load: ": "は積込み不可： ",
     ": lost aircraft replaced.": ": 失われた航空機は交換されました。",
-    "{0}: {1} {2}, {3} ready.": "{0}：{2} {1}機（出撃可能{3}機）。",
+    "{0}: {1} {2}, {3} ready.": "{0}：{2} {1}機（準備完了{3}機）。",
     "Transports loading": "輸送機の積込み中",
     "Numbers": "数量",
     "Info": "情報",
@@ -3279,10 +3279,13 @@
       "Buy a flight": "編隊を購入します",
       "Buy an airlift flight": "空輸編隊を購入します",
       "No transports left (buy a flight)": "輸送機は残りません (編隊を購入してください)",
-      "{0}: {1} ready": "{0}: {1} 準備完了",
+      "{0}: {1} ready": "{0}：{1} 準備完了",
       "{0} loading for an airlift": "{0}機が空輸用積込み中",
       "{0} in the air": "{0}機が飛行中",
       "{0} in maintenance": "{0}機が整備中"
+    },
+    "DynamicCampaignMod.UI.Strategy.ConvoysViewModel/<>c__DisplayClass83_0::<AirliftCardOf>b__2(System.Linq.IGrouping`2<System.String,DynamicCampaignMod.Core.State.Airframe>)": {
+      "{0} {1}": "{0}機の{1}"
     },
     "DynamicCampaignMod.UI.Strategy.ConvoysViewModel::Send(DynamicCampaignMod.Core.Data.BaseDefinition)": {
       "An airlift is loading for ": "空輸の積込み先： "
@@ -5241,7 +5244,7 @@
       "arriving": "到着",
       "arrives ": "到着： ",
       "No convoy on its way.": "到着待ち船団はありません。",
-      "{0} squadron{1}, {2} aircraft: {3} ready, {4} airborne": "{0}飛行隊{1}・{2}機：出撃可能{3}、飛行中{4}",
+      "{0} squadron{1}, {2} aircraft: {3} ready, {4} airborne": "{0}飛行隊{1}・{2}機：準備完了{3}、飛行中{4}",
       "s": "",
       "No aircraft based here.": "ここに拠点を置く航空機はありません。"
     },
@@ -5304,7 +5307,7 @@
       ": lost aircraft replaced.": ": 失われた航空機は交換されました。"
     },
     "DynamicCampaignMod.UI.Base.BaseScreenViewModel/<>c__DisplayClass33_0::<RefreshAirlift>b__4(DynamicCampaignMod.Core.State.Squadron)": {
-      "{0}: {1} {2}, {3} ready.": "{0}：{2} {1}機（出撃可能{3}機）。"
+      "{0}: {1} {2}, {3} ready.": "{0}：{2} {1}機（準備完了{3}機）。"
     },
     "DynamicCampaignMod.UI.Base.BaseScreenViewModel/<>c__DisplayClass7_0::<.ctor>b__5()": {
       "Transports loading": "輸送機の積込み中"
