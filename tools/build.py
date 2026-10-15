@@ -18,7 +18,8 @@ def main():
         shutil.rmtree(package)
     package.mkdir(parents=True, exist_ok=True)
     shutil.copy2(binary, package / binary.name)
-    shutil.copy2(ROOT / 'localization/translation-data.json', package / 'translation-data.json')
+    for name in ('translation-data.json', 'campaign-ship-names.json'):
+        shutil.copy2(ROOT / 'localization' / name, package / name)
     for path in (ROOT / 'package').iterdir():
         if path.is_file():
             shutil.copy2(path, package / path.name)

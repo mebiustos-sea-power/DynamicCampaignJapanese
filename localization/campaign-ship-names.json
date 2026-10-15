@@ -1,0 +1,16 @@
+{
+  "format": 1,
+  "ships": {
+    "usn_cv_kitty_hawk": {
+      "Midway CV-41": "ミッドウェイ CV-41"
+    },
+    "jmsdf_ddh_haruna": {
+      "Shirane DDH-143": "しらね DDH-143",
+      "Kurama DDH-144": "くらま DDH-144"
+    },
+    "wp_takr_kiev": {
+      "Minsk": "ミンスク",
+      "Novorossiysk": "ノヴォロシースク"
+    }
+  }
+}

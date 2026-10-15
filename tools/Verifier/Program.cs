@@ -37,7 +37,9 @@ internal static class Program
             var original = AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.Combine(originalDirectory, "DynamicCampaignMod.dll"));
             var gameAssembly = AppDomain.CurrentDomain.GetAssemblies().Single(assembly => assembly.GetName().Name == "Seapower-Scripts");
             var shipNames = ShipNameChecks.LoadSource(Game, gameAssembly, Errors);
-            var shipDisplays = ShipNameChecks.VerifyDisplay(shipNames.Translations, original, Errors);
+            var campaignShipNames = CampaignShipNames.Load(Path.Combine(root, "localization", "campaign-ship-names.json"));
+            var shipDisplays = ShipNameChecks.VerifyDisplay(shipNames.Translations, campaignShipNames, original, Errors);
+            var campaignShipDisplays = CampaignShipNameChecks.Verify(root, original, Errors);
             var loadoutDisplays = AirLoadoutChecks.Verify(Game, gameAssembly, original, Errors);
             var oldAssembly = Assembly.LoadFile(Path.Combine(baselineDirectory, "installed-package", "DynamicCampaignJapanese.dll"));
             AssemblyLoadContext.GetLoadContext(oldAssembly)!.Resolving += ResolveGameAssembly;
@@ -128,7 +130,7 @@ internal static class Program
                 var args = new object?[] { File.ReadAllText(file), definition, null, null };
                 var state = readSave.Invoke(null, args);
                 if (state == null || args[3] != null) Errors.Add("Save failed to load: " + Path.GetFileName(file) + " / " + args[3]);
-                var shipSaveCheck = state == null ? null : ShipNameChecks.VerifySave(original, state, args[2], shipNames.Translations, Errors);
+                var shipSaveCheck = state == null ? null : ShipNameChecks.VerifySave(original, state, args[2], shipNames.Translations, campaignShipNames, Errors);
                 saves.Add(new JObject
                 {
                     ["name"] = Path.GetFileName(file), ["loaded"] = state != null, ["error"] = args[3]?.ToString(),
@@ -153,6 +155,7 @@ internal static class Program
             report["startupChecks"] = startupChecks;
             report["compatibilityChecks"] = compatibilityChecks;
             report["shipDisplayChecks"] = shipDisplays;
+            report["campaignShipDisplayChecks"] = campaignShipDisplays;
             report["loadoutDisplayChecks"] = loadoutDisplays;
             report["contextualMessageChecks"] = contextualMessages;
             File.WriteAllText(Path.Combine(root, "artifacts", "verification-report.json"), report.ToString(Formatting.Indented));

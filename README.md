@@ -42,7 +42,9 @@ WSLではプロジェクトをWindowsドライブ上に置き、`python3 tools/b
 
 Windows版の `dotnet.exe` をPATHから探します。見つからない場合は `DOTNET_EXE` に実行ファイルのパスを指定してください。NuGetの外部パッケージは取得しません。
 
-配布フォルダーは `artifacts/package/DynamicCampaignJapanese`、ZIPは `artifacts/DynamicCampaignJapanese.zip` に生成します。内容は `DynamicCampaignJapanese.dll`、`translation-data.json`、`_info.ini`、`CREDITS.txt` の4ファイルです。生成物はGit管理対象外です。
+配布フォルダーは `artifacts/package/DynamicCampaignJapanese`、ZIPは `artifacts/DynamicCampaignJapanese.zip` に生成します。内容は `DynamicCampaignJapanese.dll`、`translation-data.json`、`campaign-ship-names.json`、`_info.ini`、`CREDITS.txt` の5ファイルです。生成物はGit管理対象外です。
+
+キャンペーン独自の個艦名は `localization/campaign-ship-names.json` で管理します。`ships` 配下にユニットID、その下に元の艦名と日本語名の対訳を登録します。辞書は起動時に読み込み、表示時にゲーム本体の艦名対応表より優先して参照します。
 
 ## ソースの構成
 

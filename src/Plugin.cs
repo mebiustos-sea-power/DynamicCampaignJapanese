@@ -76,9 +76,10 @@ public sealed class Plugin : IAnchorChainMod
             {
                 var game = AppDomain.CurrentDomain.GetAssemblies().Single(assembly => assembly.GetName().Name == "Seapower-Scripts");
                 var shipNames = GameShipNames.Load(game, message => Log.LogWarning(message));
-                var displays = new ShipDisplayIntegration(originalAssembly!, shipNames.Translations, () => shipNames.NatoNames);
+                var campaignNames = CampaignShipNames.Load(Path.Combine(Path.GetDirectoryName(typeof(Plugin).Assembly.Location)!, "campaign-ship-names.json"));
+                var displays = new ShipDisplayIntegration(originalAssembly!, shipNames.Translations, campaignNames, () => shipNames.NatoNames);
                 var shipCount = displays.Install(originalAssembly!, harmony!, message => Log.LogWarning(message), message => Log.LogError(message));
-                Log.LogInfo("Japanese ship-name display translation active; units=" + shipNames.Translations.UnitCount + "; methods=" + shipCount);
+                Log.LogInfo("Japanese ship-name display translation active; units=" + shipNames.Translations.UnitCount + "; methods=" + shipCount + "; campaignNames=" + campaignNames.NameCount);
             }
             catch (Exception error)
             {

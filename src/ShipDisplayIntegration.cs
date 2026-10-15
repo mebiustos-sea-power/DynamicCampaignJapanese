@@ -14,6 +14,7 @@ public sealed class ShipDisplayIntegration
     private const string CatalogType = "DynamicCampaignMod.Game.Units.UnitCatalog";
     private static ShipDisplayIntegration? current;
     private readonly ShipNameTranslations names;
+    private readonly CampaignShipNames campaignNames;
     private readonly Func<bool> natoNames;
     private readonly FieldInfo hullName;
     private readonly FieldInfo hullUnit;
@@ -47,9 +48,10 @@ public sealed class ShipDisplayIntegration
         ["DynamicCampaignMod.UI.AirBase.CarrierAirViewModel/"] = new[] { "<Refresh>b__" }
     };
 
-    public ShipDisplayIntegration(Assembly original, ShipNameTranslations names, Func<bool> natoNames)
+    public ShipDisplayIntegration(Assembly original, ShipNameTranslations names, CampaignShipNames campaignNames, Func<bool> natoNames)
     {
         this.names = names;
+        this.campaignNames = campaignNames;
         this.natoNames = natoNames;
         var hull = original.GetType(HullType, true)!;
         hullName = hull.GetField("Name") ?? throw new MissingFieldException(HullType, "Name");
@@ -94,7 +96,13 @@ public sealed class ShipDisplayIntegration
         return patched;
     }
 
-    public string? NameOf(object hull) => names.Ship((string?)hullUnit.GetValue(hull), (string?)hullVariant.GetValue(hull), (string?)hullName.GetValue(hull));
+    public string? NameOf(object hull)
+    {
+        var unit = (string?)hullUnit.GetValue(hull);
+        var original = (string?)hullName.GetValue(hull);
+        return campaignNames.TryTranslate(unit, original, out var translated)
+            ? translated : names.Ship(unit, (string?)hullVariant.GetValue(hull), original);
+    }
     public (string Abbreviation, string Kind, string Class) TypeOf(string unit)
     {
         var original = typeOf(unit);

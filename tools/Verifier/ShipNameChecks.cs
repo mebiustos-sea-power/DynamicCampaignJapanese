@@ -30,7 +30,7 @@ internal static class ShipNameChecks
         return names;
     }
 
-    public static JObject VerifyDisplay(ShipNameTranslations names, Assembly original, List<string> errors)
+    public static JObject VerifyDisplay(ShipNameTranslations names, CampaignShipNames campaignNames, Assembly original, List<string> errors)
     {
         Check(names.Ship("usn_aoe_sacramento", null, "Sacramento AOE-1"), "サクラメント AOE-1", "Explicit English hull name", errors);
         Check(names.Ship("usn_aoe_sacramento", "Variant2", "Camden AOE-2"), "カムデン AOE-2", "Named variant", errors);
@@ -43,7 +43,7 @@ internal static class ShipNameChecks
         Check(names.Class("usn_aoe_sacramento", "Custom class", false), "Custom class", "Unknown class", errors);
 
         var fixture = Fixture();
-        var integration = new ShipDisplayIntegration(fixture.Assembly, names, () => FakeOptions.NatoUnitNamesEnabled);
+        var integration = new ShipDisplayIntegration(fixture.Assembly, names, campaignNames, () => FakeOptions.NatoUnitNamesEnabled);
         var before = (string)fixture.Display.Invoke(null, new[] { fixture.Hull })!;
         typeof(ShipDisplayIntegration).GetField("current", BindingFlags.NonPublic | BindingFlags.Static)!.SetValue(null, integration);
         var translated = Compile(fixture.Display, integration.TranslateInstructions(InstructionReader.Read(fixture.Display), fixture.Display));
@@ -55,7 +55,7 @@ internal static class ShipNameChecks
             errors.Add("Rendering a ship changed its internal name or variant.");
         var guarded = original.GetType("DynamicCampaignMod.UI.Details.TaskForceDetailsViewModel", true)!.GetMethod("AirGroupText", BindingFlags.NonPublic | BindingFlags.Instance)!;
         var stateFactory = original.GetType("DynamicCampaignMod.Core.Sim.StateFactory+ShipNames", true)!.GetMethod("Name", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
-        var realIntegration = new ShipDisplayIntegration(original, names, () => false);
+        var realIntegration = new ShipDisplayIntegration(original, names, campaignNames, () => false);
         foreach (var method in new[] { guarded, stateFactory })
         {
             var input = InstructionReader.Read(method);
@@ -95,11 +95,11 @@ internal static class ShipNameChecks
             ["targets"] = JArray.FromObject(targets.Select(MethodIdentity.Of)), ["internalNameProcessingPreserved"] = true };
     }
 
-    public static JObject VerifySave(Assembly original, object state, object? header, ShipNameTranslations names, List<string> errors)
+    public static JObject VerifySave(Assembly original, object state, object? header, ShipNameTranslations names, CampaignShipNames campaignNames, List<string> errors)
     {
         var write = original.GetType("DynamicCampaignMod.Core.State.CampaignSave", true)!.GetMethod("Write", BindingFlags.Static | BindingFlags.Public)!;
         var before = (string)write.Invoke(null, new[] { state, header })!;
-        var integration = new ShipDisplayIntegration(original, names, () => false);
+        var integration = new ShipDisplayIntegration(original, names, campaignNames, () => false);
         var changes = new JArray();
         foreach (var force in (IEnumerable)state.GetType().GetField("TaskForces")!.GetValue(state)!)
             foreach (var hull in (IEnumerable)force.GetType().GetField("Ships")!.GetValue(force)!)
