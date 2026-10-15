@@ -54,6 +54,8 @@ internal static class Program
                 var actual = markup.Translate((string)resource["Original"]!);
                 File.WriteAllText(Path.Combine(root, "artifacts", "xaml-generated", (string)resource["Name"]!), actual);
                 var left = System.Xml.Linq.XDocument.Parse(expected);
+                var originalMarkup = System.Xml.Linq.XDocument.Parse((string)resource["Original"]!);
+                left.Root!.SetAttributeValue("TextElement.FontFamily", originalMarkup.Root!.Attribute("TextElement.FontFamily")?.Value);
                 var right = System.Xml.Linq.XDocument.Parse(actual);
                 if (!System.Xml.Linq.XNode.DeepEquals(left, right)) Errors.Add("XAML mismatch: " + resource["Name"]);
             }

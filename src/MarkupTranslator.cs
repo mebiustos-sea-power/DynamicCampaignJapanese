@@ -19,8 +19,7 @@ public sealed class MarkupTranslator
             XmlResolver = null
         });
         var document = XDocument.Load(reader, LoadOptions.PreserveWhitespace);
-        (document.Root ?? throw new XmlException("XAML has no root element."))
-            .SetAttributeValue("TextElement.FontFamily", "Microsoft YaHei");
+        _ = document.Root ?? throw new XmlException("XAML has no root element.");
         foreach (var element in document.Descendants())
         foreach (var attribute in element.Attributes())
         {
