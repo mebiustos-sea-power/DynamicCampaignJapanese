@@ -6,6 +6,8 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\DynamicCampaignJapanese.csproj" />
+    <Reference Include="MonoMod.Utils" HintPath="$(SeaPowerDir)\BepInEx\core\MonoMod.Utils.dll" Private="true" />
+    <Reference Include="Mono.Cecil" HintPath="$(SeaPowerDir)\BepInEx\core\Mono.Cecil.dll" Private="true" />
     <Reference Include="0Harmony" HintPath="$(SeaPowerDir)\BepInEx\core\0Harmony.dll" Private="true" />
     <Reference Include="AnchorChain" HintPath="$(AnchorChainDir)\AnchorChain.dll" Private="true" />
     <Reference Include="BepInEx" HintPath="$(SeaPowerDir)\BepInEx\core\BepInEx.dll" Private="true" />

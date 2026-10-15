@@ -7,6 +7,8 @@ using System.Reflection.Emit;
 using System.Xml.Linq;
 using DynamicCampaignJapanese;
 using HarmonyLib;
+using MonoMod.Cil;
+using Mono.Cecil;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -80,8 +82,7 @@ internal static class ContextualMessageChecks
     {
         var type = original.GetType("DynamicCampaignMod.Core.Sim.AlertLines", true)!;
         var method = type.GetMethod("Add", All)!;
-        var source = InstructionReader.Read(method);
-        var output = integration.TranslateInstructions(source, method).ToArray();
+        var output = TranslationILChecks.Read(method, integration).ToArray();
         typeof(OriginalModIntegration).GetField("current", All)!.SetValue(null, integration);
         var translated = Compile(method, output);
         object Create(string name) => Activator.CreateInstance(original.GetType("DynamicCampaignMod.Core." + name, true)!)!;
@@ -134,16 +135,18 @@ internal static class ContextualMessageChecks
             results.Add(new JObject { ["scenario"] = scenario.Name, ["message"] = text, ["stateUnchanged"] = true });
         }
 
-        var changed = source.Select(instruction => new CodeInstruction(instruction)).ToArray();
-        changed.Single(instruction => instruction.opcode == OpCodes.Ldstr && Equals(instruction.operand, " at ")).operand = " near ";
+        using var changedModule = ModuleDefinition.ReadModule(method.Module.FullyQualifiedName);
+        var changed = (MethodDefinition)changedModule.LookupToken(method.MetadataToken);
+        changed.Body.Instructions.Single(instruction => instruction.OpCode == Mono.Cecil.Cil.OpCodes.Ldstr && Equals(instruction.Operand, " at ")).Operand = " near ";
+        var beforeInstructions = changed.Body.Instructions.Select(instruction => (instruction.OpCode, instruction.Operand)).ToArray();
         var warnings = new List<string>();
-        var skipped = AircraftMessageTranslation.TranslateInstructions(changed, method, catalog, warnings.Add).ToArray();
-        if (warnings.Count != 1 || !changed.Select(Value).SequenceEqual(skipped.Select(Value)))
+        using var context = new ILContext(changed);
+        context.Invoke(il => AircraftMessageTranslation.TranslateIL(il, method, catalog, warnings.Add));
+        if (warnings.Count != 1 || !beforeInstructions.SequenceEqual(changed.Body.Instructions.Select(instruction => (instruction.OpCode, instruction.Operand))))
             errors.Add("Unrecognized aircraft message generation was changed or skipped without a warning.");
         return new JObject { ["rejectionScenarios"] = results, ["unrecognizedMessageLoggedAndPreserved"] = warnings.Count == 1 };
     }
 
-    private static (OpCode, object?) Value(CodeInstruction instruction) => (instruction.opcode, instruction.operand);
     private static object Get(object target, string name) => target.GetType().GetField(name, All)!.GetValue(target)!;
     private static void Set(object target, string name, object? value) => target.GetType().GetField(name, All)!.SetValue(target, value);
 

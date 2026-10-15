@@ -72,13 +72,12 @@ internal static class Program
             foreach (var method in plan)
             {
                 List<CodeInstruction> source;
-                try { source = InstructionReader.Read(method); }
+                try { source = TranslationILChecks.Read(method); }
                 catch (Exception error) { throw new InvalidOperationException("Cannot inspect " + MethodIdentity.Of(method), error); }
                 var left = source.Select(instruction => new CodeInstruction(instruction)).ToList();
-                var right = source.Select(instruction => new CodeInstruction(instruction)).ToList();
                 var expected = ((IEnumerable<CodeInstruction>)oldTranspiler.Invoke(null, new object[] { left, method })!).ToArray();
                 expected = ContextualMessageChecks.ExpectedInstructions(method, source, expected);
-                var actual = integration.TranslateInstructions(right, method).ToArray();
+                var actual = TranslationILChecks.Read(method, integration).ToArray();
                 if (MethodIdentity.Of(method) == AircraftMessageTranslation.Target)
                 {
                     expected = ContextualMessageChecks.NormalizeAircraftMessage(expected, false);
@@ -94,7 +93,7 @@ internal static class Program
                     instructionsCompared++;
                     var a = expected[index];
                     var b = actual[index];
-                    if (a.opcode != b.opcode || !Equals(NormalizeOperand(a.operand), NormalizeOperand(b.operand)) ||
+                    if (a.opcode != b.opcode || !OperandsEqual(a.operand, b.operand) ||
                         !MetadataEqual(a, b, "labels") || !MetadataEqual(a, b, "blocks"))
                         Errors.Add("Instruction mismatch: " + MethodIdentity.Of(method) + " / " + index + " / " + a + " / " + b);
                 }
@@ -113,7 +112,7 @@ internal static class Program
             foreach (var pair in new[] { ("DynamicCampaignMod.UI.Strategy.FleetGroupRow", "set_Speed", "Speed"), ("DynamicCampaignMod.UI.Strategy.StockBaseRow", "set_Weapons", "Weapons") })
             {
                 var method = original.GetType(pair.Item1, true)!.GetMethod(pair.Item2, All)!;
-                var output = integration.TranslateInstructions(InstructionReader.Read(method), method).ToArray();
+                var output = TranslationILChecks.Read(method, integration).ToArray();
                 var values = output.Where(instruction => instruction.opcode == OpCodes.Ldstr).Select(instruction => (string)instruction.operand).ToArray();
                 if (!values.Contains(pair.Item3, StringComparer.Ordinal)) Errors.Add("Binding property was translated: " + pair.Item3);
                 bindings.Add(new JObject { ["method"] = MethodIdentity.Of(method), ["preserved"] = pair.Item3 });
@@ -223,6 +222,9 @@ internal static class Program
         return null;
     }
 
+    private static bool OperandsEqual(object? left, object? right) => left is Label[] a && right is Label[] b
+        ? a.SequenceEqual(b) : Equals(NormalizeOperand(left), NormalizeOperand(right));
+
     private static object? NormalizeOperand(object? operand)
     {
         if (operand is MethodInfo method)
@@ -237,10 +239,12 @@ internal static class Program
     private static bool MetadataEqual(CodeInstruction left, CodeInstruction right, string name)
     {
         var field = typeof(CodeInstruction).GetField(name)!;
-        var a = ((IEnumerable)field.GetValue(left)!).Cast<object>().ToArray();
-        var b = ((IEnumerable)field.GetValue(right)!).Cast<object>().ToArray();
+        var a = ((IEnumerable)field.GetValue(left)!).Cast<object>().Select(MetadataValue).ToArray();
+        var b = ((IEnumerable)field.GetValue(right)!).Cast<object>().Select(MetadataValue).ToArray();
         return a.SequenceEqual(b);
     }
+
+    private static object MetadataValue(object value) => value is ExceptionBlock block ? (block.blockType, block.catchType) : value;
 
     private sealed class Leaf
     {

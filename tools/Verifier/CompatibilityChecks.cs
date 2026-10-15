@@ -111,7 +111,7 @@ internal static class CompatibilityChecks
 
         var translated = new DynamicMethod("TranslatedCaption", typeof(string), Type.EmptyTypes);
         var output = translated.GetILGenerator();
-        foreach (var instruction in integration.TranslateInstructions(InstructionReader.Read(created.GetMethod("Caption")!), created.GetMethod("Caption")!))
+        foreach (var instruction in TranslationILChecks.Read(created.GetMethod("Caption")!, integration))
         {
             if (instruction.operand is string text) output.Emit(instruction.opcode, text);
             else if (instruction.operand == null) output.Emit(instruction.opcode);

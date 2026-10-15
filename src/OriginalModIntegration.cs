@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.Emit;
 using HarmonyLib;
+using Mono.Cecil;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
 
 namespace DynamicCampaignJapanese;
 
@@ -48,14 +50,14 @@ public sealed class OriginalModIntegration
         var plan = Plan(assembly, logWarning);
         this.logWarning = logWarning;
         current = this;
-        var transpiler = new HarmonyMethod(typeof(OriginalModIntegration).GetMethod(nameof(TranspileCurrent)));
+        var manipulator = new HarmonyMethod(typeof(OriginalModIntegration).GetMethod(nameof(ManipulateCurrent)));
         var patched = 0;
         try
         {
             foreach (var method in plan)
             {
                 if (method.IsConstructor && method.IsStatic) continue;
-                try { harmony.Patch(method, transpiler: transpiler); }
+                try { harmony.Patch(method, ilmanipulator: manipulator); }
                 catch (Exception error) { throw new InvalidOperationException("Cannot apply Japanese translation to " + MethodIdentity.Of(method), error); }
                 patched++;
             }
@@ -71,36 +73,33 @@ public sealed class OriginalModIntegration
         }
     }
 
-    public IEnumerable<CodeInstruction> TranslateInstructions(IEnumerable<CodeInstruction> instructions, MethodBase original)
+    public void TranslateIL(ILContext context, MethodBase original)
     {
         var identity = MethodIdentity.Of(original);
         catalog.Methods.TryGetValue(identity, out var literals);
         var isMarkup = identity == XamlLoad || identity == XamlParse;
         var isCampaign = identity == CampaignLoad;
-        foreach (var source in AircraftMessageTranslation.TranslateInstructions(instructions, original, catalog, logWarning))
+        AircraftMessageTranslation.TranslateIL(context, original, catalog, logWarning);
+        foreach (var instruction in context.Body.Instructions.ToArray())
         {
-            var instruction = new CodeInstruction(source);
-            if (instruction.opcode == OpCodes.Ldstr && instruction.operand is string text &&
-                literals != null && literals.TryGetValue(text, out var translated)) instruction.operand = translated;
+            // Edit the existing instructions so branch targets and exception boundaries remain intact.
+            if (instruction.OpCode == OpCodes.Ldstr && instruction.Operand is string text &&
+                literals != null && literals.TryGetValue(text, out var translated)) instruction.Operand = translated;
 
-            if (isMarkup && instruction.operand is MethodInfo parse && parse.DeclaringType?.FullName == "Noesis.GUI" && parse.Name == "ParseXaml")
+            if (isMarkup && instruction.Operand is MethodReference parse && parse.DeclaringType.FullName == "Noesis.GUI" && parse.Name == "ParseXaml")
             {
-                var translate = new CodeInstruction(OpCodes.Call, typeof(OriginalModIntegration).GetMethod(nameof(TranslateMarkup)));
-                instruction.MoveLabelsTo(translate);
-                instruction.MoveBlocksTo(translate);
-                yield return translate;
+                var parseCall = Instruction.Create(instruction.OpCode, parse);
+                instruction.OpCode = OpCodes.Call;
+                instruction.Operand = context.Import(typeof(OriginalModIntegration).GetMethod(nameof(TranslateMarkup))!);
+                context.IL.InsertAfter(instruction, parseCall);
             }
-            if (isCampaign && instruction.operand is MethodInfo read && read.DeclaringType == typeof(File) &&
-                read.Name == nameof(File.ReadAllText) && read.GetParameters().Length == 1)
-                instruction.operand = typeof(OriginalModIntegration).GetMethod(nameof(ReadCampaign));
-            yield return instruction;
+            if (isCampaign && instruction.Operand is MethodReference read && read.DeclaringType.FullName == typeof(File).FullName &&
+                read.Name == nameof(File.ReadAllText) && read.Parameters.Count == 1)
+                instruction.Operand = context.Import(typeof(OriginalModIntegration).GetMethod(nameof(ReadCampaign))!);
         }
     }
 
-    public static IEnumerable<CodeInstruction> TranspileCurrent(IEnumerable<CodeInstruction> instructions, MethodBase __originalMethod)
-    {
-        return Active().TranslateInstructions(instructions, __originalMethod);
-    }
+    public static void ManipulateCurrent(ILContext context, MethodBase original) => Active().TranslateIL(context, original);
 
     public static string MissingAircraft(string aircraftName, string baseName) =>
         string.Format(Active().catalog.Methods[AircraftMessageTranslation.Target][AircraftMessageTranslation.Template], aircraftName, baseName);
