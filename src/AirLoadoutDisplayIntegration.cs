@@ -12,6 +12,7 @@ public sealed class AirLoadoutDisplayIntegration
     private const BindingFlags Declared = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly;
     private const string LoadoutType = "DynamicCampaignMod.Core.Data.LoadoutSpec";
     private const string PickerType = "DynamicCampaignMod.UI.AirBase.PickerItem";
+    private const string ShipyardLoadoutDisplay = "DynamicCampaignMod.UI.Strategy.ProcurementViewModel/<>c::<RefreshDetail>b__162_10(DynamicCampaignMod.Core.Data.LoadoutSpec)";
     private static readonly string[] Views =
     {
         "DynamicCampaignMod.UI.AirBase.AirBaseViewModel",
@@ -26,10 +27,13 @@ public sealed class AirLoadoutDisplayIntegration
     public IReadOnlyList<MethodInfo> Plan(Assembly original, Action<string>? logWarning = null)
     {
         var plan = original.GetTypes().SelectMany(type => type.GetMethods(Declared))
-            .Where(IsLoadoutFactory).OrderBy(MethodIdentity.Of, StringComparer.Ordinal).ToArray();
+            .Where(method => IsLoadoutFactory(method) || IsShipyardLoadoutDisplay(method))
+            .OrderBy(MethodIdentity.Of, StringComparer.Ordinal).ToArray();
         foreach (var view in Views)
             if (!plan.Any(method => method.DeclaringType!.FullName!.StartsWith(view + "+", StringComparison.Ordinal)))
                 logWarning?.Invoke("Loadout display target not found; skipped: " + view + "::UpdateLoadouts");
+        if (!plan.Any(IsShipyardLoadoutDisplay))
+            logWarning?.Invoke("Loadout display target not found; skipped: " + ShipyardLoadoutDisplay);
         return plan;
     }
 
@@ -60,6 +64,17 @@ public sealed class AirLoadoutDisplayIntegration
         Action<string>? logWarning = null)
     {
         var result = instructions.Select(instruction => new CodeInstruction(instruction)).ToList();
+        if (IsShipyardLoadoutDisplay(original))
+        {
+            if (result.Count != 3 || result[0].opcode != OpCodes.Ldarg_1 || !ReadsName(result[1]) || result[2].opcode != OpCodes.Ret)
+            {
+                logWarning?.Invoke("Shipyard loadout display construction was not recognized; skipped: " + MethodIdentity.Of(original));
+                return result;
+            }
+            // This selector supplies the shipyard's display list without changing LoadoutSpec.Name.
+            result.Insert(2, new CodeInstruction(OpCodes.Call, typeof(AirLoadoutDisplayIntegration).GetMethod(nameof(DisplayName))));
+            return result;
+        }
         if (!IsLoadoutFactory(original)) return result;
         var matches = new List<int>();
         for (var index = 0; index + 3 < result.Count; index++)
@@ -85,6 +100,7 @@ public sealed class AirLoadoutDisplayIntegration
     private static AirLoadoutDisplayIntegration Active() => current ?? throw new InvalidOperationException("Loadout display translations have not been initialized.");
     private static bool ReadsName(CodeInstruction instruction) => instruction.opcode == OpCodes.Ldfld &&
         instruction.operand is FieldInfo field && field.DeclaringType?.FullName == LoadoutType && field.Name == "Name" && field.FieldType == typeof(string);
+    private static bool IsShipyardLoadoutDisplay(MethodBase method) => MethodIdentity.Of(method) == ShipyardLoadoutDisplay;
     private static bool IsLoadoutFactory(MethodBase method) => method is MethodInfo info && info.ReturnType.FullName == PickerType &&
         info.GetParameters().Length == 1 && info.GetParameters()[0].ParameterType.FullName == LoadoutType &&
         info.Name.StartsWith("<UpdateLoadouts>b__", StringComparison.Ordinal) && Views.Any(view =>

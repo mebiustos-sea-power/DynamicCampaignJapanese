@@ -39,9 +39,13 @@ internal static class AirLoadoutChecks
         var integration = new AirLoadoutDisplayIntegration(names);
         typeof(AirLoadoutDisplayIntegration).GetField("current", All)!.SetValue(null, integration);
         var warnings = new List<string>();
-        var factories = integration.Plan(original, warnings.Add);
+        var targets = integration.Plan(original, warnings.Add);
+        var factories = targets.Where(method => method.ReturnType.FullName == "DynamicCampaignMod.UI.AirBase.PickerItem").ToList();
+        var shipyardSelectors = targets.Where(method => method.ReturnType == typeof(string)).ToList();
         if (factories.Count != 2 || warnings.Count != 0) errors.Add("Both airfield and carrier loadout displays were not found.");
+        if (shipyardSelectors.Count != 1) errors.Add("The shipyard aircraft loadout display was not found.");
         var cases = new JArray();
+        var shipyardCases = new JArray();
         foreach (var factory in factories)
         {
             var aircraft = Activator.CreateInstance(original.GetType("DynamicCampaignMod.Core.Data.AircraftSpec", true)!)!;
@@ -88,7 +92,40 @@ internal static class AirLoadoutChecks
             cases.Add(new JObject { ["view"] = viewType.Name, ["loadoutsChecked"] = checkedCount,
                 ["internalKeysPreserved"] = true, ["selectionPreserved"] = true, ["aircraftAndLoadoutDataUnchanged"] = true });
         }
-        if (warnings.Count != factories.Count) errors.Add("Unrecognized loadout displays were not reported.");
+        foreach (var selector in shipyardSelectors)
+        {
+            var closure = Activator.CreateInstance(selector.DeclaringType!, true)!;
+            var input = InstructionReader.Read(selector);
+            var translated = Compile(selector, integration.TranslateInstructions(input, selector, warnings.Add));
+            var checkedCount = 0;
+            foreach (var key in ini.Values.Keys.Concat(new[] { "UntranslatedCustomLoadout" }))
+            {
+                var loadout = Activator.CreateInstance(selector.GetParameters()[0].ParameterType)!;
+                loadout.GetType().GetField("Name")!.SetValue(loadout, key);
+                loadout.GetType().GetField("ReadyUpMinutes")!.SetValue(loadout, 15);
+                loadout.GetType().GetField("Weapons")!.SetValue(loadout, new Dictionary<string, int> { ["example_missile"] = 2 });
+                var before = JsonConvert.SerializeObject(loadout);
+                var text = (string)translated.Invoke(null, new[] { closure, loadout })!;
+                if (text != ini.Values.GetValueOrDefault(key, key)) errors.Add("Shipyard loadout display mismatch: " + key);
+                if ((string)selector.Invoke(closure, new[] { loadout })! != key || JsonConvert.SerializeObject(loadout) != before)
+                    errors.Add("Rendering a shipyard loadout changed its internal key or data: " + key);
+                checkedCount++;
+            }
+            var changed = input.Select(instruction => new CodeInstruction(instruction)).ToArray();
+            changed[1] = new CodeInstruction(OpCodes.Ldstr, "custom display");
+            if (!SameInstructions(changed, integration.TranslateInstructions(changed, selector, warnings.Add)))
+                errors.Add("An unrecognized shipyard loadout display was partially patched.");
+            shipyardCases.Add(new JObject { ["method"] = MethodIdentity.Of(selector), ["loadoutsChecked"] = checkedCount,
+                ["internalKeysPreserved"] = true, ["loadoutDataUnchanged"] = true });
+        }
+        if (warnings.Count != targets.Count) errors.Add("Unrecognized loadout displays were not reported.");
+        foreach (var name in new[] { "RefreshDetail", "OrderSelected" })
+        {
+            var method = original.GetType("DynamicCampaignMod.UI.Strategy.ProcurementViewModel", true)!.GetMethod(name, All)!;
+            var input = InstructionReader.Read(method);
+            if (!SameInstructions(input, integration.TranslateInstructions(input, method)))
+                errors.Add("Shipyard purchase or detail assembly was patched by loadout display translation: " + name);
+        }
         foreach (var type in new[] { "DynamicCampaignMod.UI.AirBase.AirBaseViewModel", "DynamicCampaignMod.UI.AirBase.CarrierAirViewModel" })
         {
             var prepare = original.GetType(type, true)!.GetMethod("Prepare", All)!;
@@ -110,7 +147,7 @@ internal static class AirLoadoutChecks
         }
         catch (InvalidOperationException) { }
         finally { FakeLoader.Data = ini; }
-        return new JObject { ["views"] = cases, ["effectiveLocalizationOverride"] = true,
+        return new JObject { ["views"] = cases, ["shipyardDisplays"] = shipyardCases, ["effectiveLocalizationOverride"] = true,
             ["unknownLoadoutNamePreserved"] = true, ["unrecognizedConstructionReported"] = true };
     }
 
