@@ -941,7 +941,7 @@
     "Load: ": "積荷： ",
     " · can't load here: ": "・ここでは積込み不可： ",
     "Leader": "先頭艦",
-    "Air group in battle: ": "戦闘中の航空部隊: ",
+    "Air group in battle: ": "搭載機（戦闘時のみ）：",
     "Air wing: ": "航空団: ",
     " ({0} short)": "（不足{0}機）",
     " · magazine {0:P0}": " · 弾薬庫 {0:P0}",
@@ -4876,7 +4876,7 @@
       "Unit reference": "ユニット図鑑"
     },
     "DynamicCampaignMod.UI.Details.TaskForceDetailsViewModel::AirGroupText(DynamicCampaignMod.Core.State.Hull)": {
-      "Air group in battle: ": "戦闘中の航空部隊: ",
+      "Air group in battle: ": "搭載機（戦闘時のみ）：",
       "Air wing: ": "航空団: ",
       " ({0} aloft)": "（飛行中{0}機）",
       " ({0} short)": "（不足{0}機）",

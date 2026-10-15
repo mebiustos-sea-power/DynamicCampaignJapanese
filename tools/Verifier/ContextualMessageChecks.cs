@@ -17,6 +17,7 @@ internal static class ContextualMessageChecks
     private static readonly Dictionary<(string Method, string Literal), string> ApprovedChanges = new()
     {
         [("DynamicCampaignMod.UI.Base.BaseScreenViewModel::SelectionChanged()", "Tick ships to form a new task force or move them to another.")] = Footer,
+        [("DynamicCampaignMod.UI.Details.TaskForceDetailsViewModel::AirGroupText(DynamicCampaignMod.Core.State.Hull)", "Air group in battle: ")] = "搭載機（戦闘時のみ）：",
         [("DynamicCampaignMod.UI.Strategy.FleetViewModel::Fill(DynamicCampaignMod.UI.Strategy.FleetGroupRow)", "In port, ")] = "港（",
         [("DynamicCampaignMod.UI.Strategy.FleetViewModel::Fill(DynamicCampaignMod.UI.Strategy.FleetGroupRow)", "At sea, holding")] = "洋上 · 待機中",
         [("DynamicCampaignMod.UI.Strategy.FleetViewModel::Fill(DynamicCampaignMod.UI.Strategy.FleetGroupRow)", "At sea, ")] = "洋上 · ",
