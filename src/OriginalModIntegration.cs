@@ -80,6 +80,7 @@ public sealed class OriginalModIntegration
         var isMarkup = identity == XamlLoad || identity == XamlParse;
         var isCampaign = identity == CampaignLoad;
         AircraftMessageTranslation.TranslateIL(context, original, catalog, logWarning);
+        AircraftQuantityTranslation.TranslateIL(context, original, catalog, logWarning);
         foreach (var instruction in context.Body.Instructions.ToArray())
         {
             // Edit the existing instructions so branch targets and exception boundaries remain intact.
@@ -103,6 +104,9 @@ public sealed class OriginalModIntegration
 
     public static string MissingAircraft(string aircraftName, string baseName) =>
         string.Format(Active().catalog.Methods[AircraftMessageTranslation.Target][AircraftMessageTranslation.Template], aircraftName, baseName);
+
+    public static string AircraftQuantity(string count, string ignoredSeparator, string name) =>
+        string.Format(Active().catalog.Methods[AircraftQuantityTranslation.Target][AircraftQuantityTranslation.Template], count, name);
 
     public static string TranslateMarkup(string value) => Active().markup.Translate(value);
     public static string ReadCampaign(string path) => Active().campaign.Translate(File.ReadAllText(path));

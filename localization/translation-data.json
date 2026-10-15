@@ -3446,6 +3446,7 @@
       "No aircraft.": "航空機はありません。"
     },
     "DynamicCampaignMod.UI.Strategy.FleetViewModel::FlightRow(DynamicCampaignMod.Core.State.Flight)": {
+      "{0} × {1} · {2}": "{1} ×{0} · {2}",
       " · from ": " · から ",
       "Show flight": "編隊を表示"
     },
@@ -3459,6 +3460,9 @@
     "DynamicCampaignMod.UI.Strategy.FleetViewModel::AirBaseRow(DynamicCampaignMod.Core.Data.BaseDefinition,System.Collections.Generic.List`1<DynamicCampaignMod.Core.State.Squadron>)": {
       "Air operations": "航空作戦",
       "Show airfield": "飛行場を表示"
+    },
+    "DynamicCampaignMod.UI.Strategy.FleetViewModel/<>c__DisplayClass44_0::<AirBaseRow>b__5(System.Linq.IGrouping`2<System.String,DynamicCampaignMod.Core.State.Airframe>)": {
+      "{0} × {1}": "{1} ×{0}"
     },
     "DynamicCampaignMod.UI.Strategy.FleetViewModel::AirBaseSummary(System.Collections.Generic.List`1<DynamicCampaignMod.Core.State.Squadron>)": {
       "{0} aircraft: ": "{0} 航空機: "
@@ -4223,6 +4227,9 @@
       "Loadouts": "兵装",
       "Speed": "速力",
       "Weapons": "兵装"
+    },
+    "DynamicCampaignMod.UI.Strategy.ProcurementViewModel::<Weapons>b__163_3(System.Collections.Generic.KeyValuePair`2<System.String,System.Int32>)": {
+      "{0} {1}": "{1} ×{0}"
     },
     "DynamicCampaignMod.UI.Strategy.ProcurementViewModel::Weapons(System.Collections.Generic.Dictionary`2<System.String,System.Int32>)": {
       "guns only": "砲のみ",
@@ -7798,6 +7805,24 @@
     },
     "DynamicCampaignMod.Core.Sim.Story/<>c__DisplayClass17_0::<BuildOpening>b__27(DynamicCampaignMod.Core.State.TaskForce)": {
       ", ": "："
+    },
+    "DynamicCampaignMod.UI.AirBase.AirBaseViewModel::<UpdateLoadoutDetails>b__122_0(System.Collections.Generic.KeyValuePair`2<System.String,System.Int32>)": {
+      "{0} {1}": "{1} ×{0}"
+    },
+    "DynamicCampaignMod.UI.AirBase.CarrierAirViewModel::<UpdateLoadoutDetails>b__120_0(System.Collections.Generic.KeyValuePair`2<System.String,System.Int32>)": {
+      "{0} {1}": "{1} ×{0}"
+    },
+    "DynamicCampaignMod.UI.Details.TaskForceDetailsViewModel/<>c__DisplayClass105_0::<AirGroupText>b__1(System.ValueTuple`2<System.String,System.Int32>)": {
+      "{0} {1}": "{1} ×{0}"
+    },
+    "DynamicCampaignMod.UI.AirBase.AirBaseViewModel::Count(System.Int32,System.String)": {
+      "{0} × {1}": "{1} ×{0}"
+    },
+    "DynamicCampaignMod.UI.AirBase.CarrierAirViewModel::Count(System.Int32,System.String)": {
+      "{0} × {1}": "{1} ×{0}"
+    },
+    "DynamicCampaignMod.UI.Details.TaskForceDetailsViewModel/<>c__DisplayClass105_0::<AirGroupText>g__Count|2(System.ValueTuple`2<System.String,System.Int32>)": {
+      "{0} {1}": "{1} ×{0}"
     }
   },
   "campaign": {

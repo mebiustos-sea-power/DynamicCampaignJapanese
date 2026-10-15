@@ -80,6 +80,7 @@ internal static class Program
                 var expected = ((IEnumerable<CodeInstruction>)oldTranspiler.Invoke(null, new object[] { left, method })!).ToArray();
                 expected = ContextualMessageChecks.ExpectedInstructions(method, source, expected, catalog);
                 var actual = TranslationILChecks.Read(method, integration).ToArray();
+                actual = QuantityDisplayChecks.Normalize(method, actual);
                 if (MethodIdentity.Of(method) == AircraftMessageTranslation.Target)
                 {
                     expected = ContextualMessageChecks.NormalizeAircraftMessage(expected, false);
@@ -141,6 +142,7 @@ internal static class Program
             }
             if (saves.Count == 0) Errors.Add("No existing save was checked.");
             var contextualMessages = ContextualMessageChecks.VerifyAircraft(original, integration, catalog, Errors);
+            var quantityDisplays = QuantityDisplayChecks.Verify(original, integration, catalog, Errors);
             var compatibilityChecks = CompatibilityChecks.VerifyPartialTranslation(root, Errors);
 
             var report = new JObject
@@ -158,6 +160,7 @@ internal static class Program
             report["campaignShipDisplayChecks"] = campaignShipDisplays;
             report["loadoutDisplayChecks"] = loadoutDisplays;
             report["contextualMessageChecks"] = contextualMessages;
+            report["quantityDisplayChecks"] = quantityDisplays;
             File.WriteAllText(Path.Combine(root, "artifacts", "verification-report.json"), report.ToString(Formatting.Indented));
             Console.WriteLine(report.ToString(Formatting.None));
             return Errors.Count == 0 ? 0 : 1;

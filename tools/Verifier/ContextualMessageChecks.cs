@@ -70,7 +70,7 @@ internal static class ContextualMessageChecks
     public static CodeInstruction[] ExpectedInstructions(MethodBase method, IReadOnlyList<CodeInstruction> source, CodeInstruction[] baseline, TranslationCatalog catalog)
     {
         var identity = MethodIdentity.Of(method);
-        var revisedText = identity.StartsWith("DynamicCampaignMod.Core.Sim.ContactBriefing::", StringComparison.Ordinal) ||
+        var revisedText = QuantityDisplayChecks.HasFormat(identity) || identity.StartsWith("DynamicCampaignMod.Core.Sim.ContactBriefing::", StringComparison.Ordinal) ||
             identity.StartsWith("DynamicCampaignMod.Core.Sim.ContactBriefing/", StringComparison.Ordinal) ||
             identity.StartsWith("DynamicCampaignMod.UI.Contact.DeploymentViewModel::", StringComparison.Ordinal) ||
             identity.StartsWith("DynamicCampaignMod.Core.Sim.Story::WeatherNote(", StringComparison.Ordinal) ||
