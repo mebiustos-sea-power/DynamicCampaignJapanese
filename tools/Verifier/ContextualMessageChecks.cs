@@ -18,6 +18,12 @@ internal static class ContextualMessageChecks
     private const string Footer = "艦艇を選択してから、任務部隊を新設するか、別の部隊へ移動。";
     private static readonly Dictionary<(string Method, string Literal), string> ApprovedChanges = new()
     {
+        [("DynamicCampaignMod.UI.TopBar.TopBarViewModel::Refresh()", "{0} · {1:N0}")] = "{0}（名声 {1:N0}",
+        [("DynamicCampaignMod.UI.TopBar.TopBarViewModel::Refresh()", "/{0:N0}")] = " / {0:N0}",
+        [("DynamicCampaignMod.UI.TopBar.TopBarViewModel::Refresh()", "{0} · victory {1}/{2}")] = "{0}（勝利対象 {1} / {2}）",
+        [("DynamicCampaignMod.UI.TopBar.TopBarViewModel::Refresh()", "{0} at sea · {1} airborne")] = "洋上 {0} · 飛行中 {1}",
+        [("DynamicCampaignMod.UI.Forces.ForcesViewModel::Update(DynamicCampaignMod.UI.Forces.ForceNode,DynamicCampaignMod.Core.State.TaskForce)", "{0} ship{1}, {2}{3}")] = "{0}隻{1}  {3}  {2}",
+        [("DynamicCampaignMod.UI.Forces.ForcesViewModel::Update(DynamicCampaignMod.UI.Forces.ForceNode,DynamicCampaignMod.Core.State.TaskForce)", ", ")] = "",
         [("DynamicCampaignMod.UI.Base.BaseScreenViewModel::SelectionChanged()", "Tick ships to form a new task force or move them to another.")] = Footer,
         [("DynamicCampaignMod.UI.Details.TaskForceDetailsViewModel::AirGroupText(DynamicCampaignMod.Core.State.Hull)", "Air group in battle: ")] = "搭載機（戦闘時のみ）：",
         [("DynamicCampaignMod.UI.Details.TaskForceDetailsViewModel::Refresh()", "In port, {0} · {1:0} kn")] = "在港（{0}） · {1:0}ノット",
@@ -42,11 +48,21 @@ internal static class ContextualMessageChecks
 
     public static string ExpectedMarkup(string name, string baseline)
     {
-        if (!name.EndsWith("BaseScreen.xaml", StringComparison.Ordinal)) return baseline;
+        var topBar = name.EndsWith("TopBar.xaml", StringComparison.Ordinal);
+        if (!topBar && !name.EndsWith("BaseScreen.xaml", StringComparison.Ordinal)) return baseline;
         var document = XDocument.Parse(baseline);
         foreach (var attribute in document.Descendants().Attributes())
         {
             if (attribute.Name.LocalName == "Content" && attribute.Value == "選択した艦艇で新しい任務部隊を編成") attribute.Value = "選択した艦艇で任務部隊を新設";
+            if (topBar && attribute.Name.LocalName == "Text")
+                attribute.Value = attribute.Value switch
+                {
+                    "階級 " => "階級：",
+                    " 名声" => "）",
+                    "基地 " => "基地：",
+                    "部隊 " => "部隊：",
+                    _ => attribute.Value
+                };
         }
         return document.ToString();
     }

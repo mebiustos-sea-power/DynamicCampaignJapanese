@@ -250,12 +250,12 @@
     "Points: what you spend on ships, aircraft, convoys and airlifts (Shipyard, Logistics). Your bases pay their income every day at 00:00Z; battles and Admiralty orders add more": "ポイントは艦艇、航空機、船団、空輸に使います（「造船所」「兵站」）。基地収入は毎日00:00Zに加算され、戦闘と海軍司令部の命令でも獲得します。",
     "Points ": "ポイント ",
     "Your rank and renown (renown now / needed for the next rank): won in battle and from Admiralty orders; each rank opens bigger ships in the Shipyard": "階級と名声（現在値／次の階級に必要な値）：戦闘と海軍司令部の命令で獲得します。昇進するたびに造船所の大型艦が解放されます。",
-    "Rank ": "階級 ",
-    " renown": " 名声",
+    "Rank ": "階級：",
+    " renown": "）",
     "Bases you hold, then those of them that count towards victory against all that do (the Victory panel)": "保有基地数と、勝利対象基地の保有数／総数（「勝利」パネル）",
-    "Bases ": "基地 ",
+    "Bases ": "基地：",
     "Your task forces at sea (convoys not counted) and flights in the air": "洋上の味方任務部隊（船団を除く）と飛行中編隊",
-    "Forces ": "部隊 ",
+    "Forces ": "部隊：",
     "s": "",
     "es": "",
     "ies": "",
@@ -3179,8 +3179,10 @@
     },
     "DynamicCampaignMod.UI.TopBar.TopBarViewModel::Refresh()": {
       "+{0} pts/day": "+{0} ポイント/日",
-      "{0} · victory {1}/{2}": "{0} · 勝利 {1}/{2}",
-      "{0} at sea · {1} airborne": "洋上{0}・飛行中{1}"
+      "{0} · victory {1}/{2}": "{0}（勝利対象 {1} / {2}）",
+      "{0} at sea · {1} airborne": "洋上 {0} · 飛行中 {1}",
+      "{0} · {1:N0}": "{0}（名声 {1:N0}",
+      "/{0:N0}": " / {0:N0}"
     },
     "DynamicCampaignMod.UI.Strategy.AdmiraltyViewModel::Refresh()": {
       "Operations run in phases, one after the other: a phase failed fails the operation. Other orders come from what the Admiralty learns of the enemy, rough and sometimes wrong. Accept (points and renown if done in time, renown lost if not) or decline at no cost.": "作戦は段階を順番に進め、1段階でも失敗すると作戦全体が失敗します。その他の命令は海軍司令部の敵情報に基づき、概略的で誤りもあります。受諾して期限内に達成するとポイントと名声を得ますが、失敗すると名声を失います。辞退に費用はありません。",
@@ -4787,8 +4789,9 @@
       "holding": "待機中",
       "waypoint": "経由点",
       "{0:0} kn to {1} {2}": "{0:0}ノット、行先{1} {2}",
-      "{0} ship{1}, {2}{3}": "{0}隻{1}、{2}{3}",
-      "s": ""
+      "{0} ship{1}, {2}{3}": "{0}隻{1}  {3}  {2}",
+      "s": "",
+      ", ": ""
     },
     "DynamicCampaignMod.UI.Forces.ForcesViewModel::Update(DynamicCampaignMod.UI.Forces.ForceNode,DynamicCampaignMod.Core.State.Flight)": {
       "on station": "任務配置中",
