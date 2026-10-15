@@ -84,6 +84,18 @@ public sealed class Plugin : IAnchorChainMod
             {
                 Log.LogError("Japanese ship-name display initialization failed: " + error);
             }
+            try
+            {
+                var game = AppDomain.CurrentDomain.GetAssemblies().Single(assembly => assembly.GetName().Name == "Seapower-Scripts");
+                var loadoutNames = GameLoadoutNames.Load(game);
+                var displays = new AirLoadoutDisplayIntegration(loadoutNames);
+                var loadoutCount = displays.Install(originalAssembly!, harmony!, message => Log.LogWarning(message), message => Log.LogError(message));
+                Log.LogInfo("Japanese aircraft loadout display translation active; methods=" + loadoutCount);
+            }
+            catch (Exception error)
+            {
+                Log.LogError("Japanese aircraft loadout display initialization failed: " + error);
+            }
         }
         catch (Exception error)
         {

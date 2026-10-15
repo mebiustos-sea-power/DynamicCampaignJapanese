@@ -38,6 +38,7 @@ internal static class Program
             var gameAssembly = AppDomain.CurrentDomain.GetAssemblies().Single(assembly => assembly.GetName().Name == "Seapower-Scripts");
             var shipNames = ShipNameChecks.LoadSource(Game, gameAssembly, Errors);
             var shipDisplays = ShipNameChecks.VerifyDisplay(shipNames.Translations, original, Errors);
+            var loadoutDisplays = AirLoadoutChecks.Verify(Game, gameAssembly, original, Errors);
             var oldAssembly = Assembly.LoadFile(Path.Combine(baselineDirectory, "installed-package", "DynamicCampaignJapanese.dll"));
             AssemblyLoadContext.GetLoadContext(oldAssembly)!.Resolving += ResolveGameAssembly;
             var legacy = oldAssembly.GetType("BungalowChinese.Runtime", true)!;
@@ -151,6 +152,7 @@ internal static class Program
             report["startupChecks"] = startupChecks;
             report["compatibilityChecks"] = compatibilityChecks;
             report["shipDisplayChecks"] = shipDisplays;
+            report["loadoutDisplayChecks"] = loadoutDisplays;
             report["contextualMessageChecks"] = contextualMessages;
             File.WriteAllText(Path.Combine(root, "artifacts", "verification-report.json"), report.ToString(Formatting.Indented));
             Console.WriteLine(report.ToString(Formatting.None));
