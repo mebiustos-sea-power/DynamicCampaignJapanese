@@ -67,12 +67,25 @@ internal static class ContextualMessageChecks
         return document.ToString();
     }
 
-    public static CodeInstruction[] ExpectedInstructions(MethodBase method, IReadOnlyList<CodeInstruction> source, CodeInstruction[] baseline)
+    public static CodeInstruction[] ExpectedInstructions(MethodBase method, IReadOnlyList<CodeInstruction> source, CodeInstruction[] baseline, TranslationCatalog catalog)
     {
         var identity = MethodIdentity.Of(method);
+        var revisedText = identity.StartsWith("DynamicCampaignMod.Core.Sim.ContactBriefing::", StringComparison.Ordinal) ||
+            identity.StartsWith("DynamicCampaignMod.Core.Sim.ContactBriefing/", StringComparison.Ordinal) ||
+            identity.StartsWith("DynamicCampaignMod.UI.Contact.DeploymentViewModel::", StringComparison.Ordinal) ||
+            identity.StartsWith("DynamicCampaignMod.Core.Sim.Story::WeatherNote(", StringComparison.Ordinal) ||
+            identity.StartsWith("DynamicCampaignMod.Core.Sim.Story::Stakes(", StringComparison.Ordinal) ||
+            identity.StartsWith("DynamicCampaignMod.Core.Sim.OrderBriefing::", StringComparison.Ordinal) ||
+            identity.StartsWith("DynamicCampaignMod.Core.Sim.Admiralty::OrderFor(", StringComparison.Ordinal) ||
+            identity.StartsWith("DynamicCampaignMod.Core.Sim.Admiralty::ReportText(", StringComparison.Ordinal) ||
+            identity.StartsWith("DynamicCampaignMod.Core.Sim.Admiralty/<>c__DisplayClass110_0::<ReportText>g__Ships|1(", StringComparison.Ordinal);
+        catalog.Methods.TryGetValue(identity, out var currentText);
         for (var i = 0; i < source.Count; i++)
-            if (source[i].opcode == OpCodes.Ldstr && source[i].operand is string literal && ApprovedChanges.TryGetValue((identity, literal), out var text))
-                baseline[i].operand = text;
+        {
+            if (source[i].opcode != OpCodes.Ldstr || source[i].operand is not string literal) continue;
+            if (ApprovedChanges.TryGetValue((identity, literal), out var text)) baseline[i].operand = text;
+            else if (revisedText && currentText != null && currentText.TryGetValue(literal, out text)) baseline[i].operand = text;
+        }
         return baseline;
     }
 

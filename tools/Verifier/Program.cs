@@ -78,7 +78,7 @@ internal static class Program
                 catch (Exception error) { throw new InvalidOperationException("Cannot inspect " + MethodIdentity.Of(method), error); }
                 var left = source.Select(instruction => new CodeInstruction(instruction)).ToList();
                 var expected = ((IEnumerable<CodeInstruction>)oldTranspiler.Invoke(null, new object[] { left, method })!).ToArray();
-                expected = ContextualMessageChecks.ExpectedInstructions(method, source, expected);
+                expected = ContextualMessageChecks.ExpectedInstructions(method, source, expected, catalog);
                 var actual = TranslationILChecks.Read(method, integration).ToArray();
                 if (MethodIdentity.Of(method) == AircraftMessageTranslation.Target)
                 {
