@@ -1911,8 +1911,8 @@
     "{0} ship{1} and {2} aircraft lost": "艦艇{0}隻{1}、航空機{2}機を喪失",
     "no losses": "損失なし",
     "From:": "発信：",
-    "To:": "宛先:",
-    "Info:": "情報:",
+    "To:": "宛先：",
+    "Info:": "通報先：",
     "SUBJ:": "件名：",
     "Flight {0}": "編隊 {0}",
     "Reach {0}": "{0} に到達",
@@ -1936,8 +1936,8 @@
     "{0}: lost aircraft replaced at {1}, {2} ({3} points)": "{0}: 失われた航空機は {1}、{2} で交換されました ({3} ポイント)",
     "; {0} more when there are the points.": "；ポイントがあれば残り{0}機も補充できます。",
     "From: ": "発信： ",
-    "To: ": "宛先: ",
-    "Info: ": "情報: ",
+    "To: ": "宛先： ",
+    "Info: ": "通報先： ",
     "SUBJ: ": "件名： ",
     "our forces": "味方部隊",
     "COMMANDER, ": "指揮官、 ",
@@ -6271,9 +6271,10 @@
     },
     "DynamicCampaignMod.Core.Sim.BriefingPaper::Body(DynamicCampaignMod.Core.Sim.Briefing,System.String)": {
       "From:": "発信：",
-      "To:": "宛先:",
-      "Info:": "情報:",
-      "SUBJ:": "件名："
+      "To:": "宛先：",
+      "Info:": "通報先：",
+      "SUBJ:": "件名：",
+      "{0}. (S) {1}:": "{0}. (S) {1}："
     },
     "DynamicCampaignMod.Core.Sim.BriefingPaper::Paper(DynamicCampaignMod.Core.Sim.Briefing)": {
       "<Border xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\" xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\" Background=\"#FFD8D0BE\" Padding=\"18\" TextElement.Foreground=\"#FF000000\" TextElement.FontFamily=\"Courier New\" TextElement.FontWeight=\"Bold\"><Border.Resources><Style TargetType=\"{x:Type TextBlock}\"><Setter Property=\"Foreground\" Value=\"#FF000000\"/><Setter Property=\"FontFamily\" Value=\"Courier New\"/><Setter Property=\"FontWeight\" Value=\"Bold\"/></Style></Border.Resources>": "<Border xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\" xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\" Background=\"#FFD8D0BE\" Padding=\"18\" TextElement.Foreground=\"#FF000000\" TextElement.FontFamily=\"Courier New\" TextElement.FontWeight=\"Bold\"><Border.Resources><Style TargetType=\"{x:Type TextBlock}\"><Setter Property=\"Foreground\" Value=\"#FF000000\"/><Setter Property=\"FontFamily\" Value=\"Courier New\"/><Setter Property=\"FontWeight\" Value=\"Bold\"/></Style></Border.Resources>"
@@ -7402,53 +7403,57 @@
       ".": "。"
     },
     "DynamicCampaignMod.Core.Sim.Story::BuildOpening(DynamicCampaignMod.Core.State.CampaignState,DynamicCampaignMod.Core.Data.IUnitCatalog)": {
-      "COMMANDER, ": "指揮官、 ",
+      "COMMANDER, ": "指揮官 ",
       "ALL COMMANDS": "全司令部",
-      "FILE": "ファイル",
-      " sends.": " が送信されます。",
+      "FILE": "記録用",
+      " sends.": " 発。",
       "We are at war with ": "交戦国： ",
-      "Hostilities with ": "との敵対行為 ",
-      " have begun.": " が始まりました。",
+      "Hostilities with ": "交戦国：",
+      " have begun.": "との戦闘が開始された。",
       "s": "",
-      " at ": " で ",
-      "In ": "で ",
-      " hands: ": " 手: ",
+      " at ": "：",
+      "In ": "",
+      " hands: ": "軍占領下の拠点：",
       "SITUATION": "状況",
       "Held by our tracking, positions firm: ": "追跡中、位置確定： ",
       "Tracked at sea, identified: ": "洋上追跡中、識別済み： ",
       "Landing forces at sea with troops embarked: ": "兵員搭載済み、洋上の上陸部隊： ",
-      "Their objective is not yet known.": "彼らの目的はまだ不明です。",
-      "Where they are bound is not yet known.": "行先はまだ不明。",
+      "Their objective is not yet known.": "当該部隊の目標は不明。",
+      "Where they are bound is not yet known.": "当該部隊の行先は不明。",
       "submarines": "潜水艦",
       "Enemy submarines are not held by our sensors. Assume them on every approach.": "敵潜水艦は未探知。すべての接近路にいると想定せよ。",
-      "No enemy submarine is held. Their absence from the plot means nothing.": "敵潜水艦は未探知だが、探知画面にいないことは不在を意味しない。",
-      "No enemy surface force is at sea.": "海上には敵の水上部隊は存在しない。",
-      "ENEMY FORCES": "敵軍",
-      "Carrier groups: ": "空母部隊： ",
-      "Amphibious: ": "揚陸: ",
-      "Landing troops: ": "上陸兵員： ",
-      "At sea: ": "海上: ",
-      "Left behind the enemy's lines: ": "敵陣の背後に取り残された: ",
-      "In enemy waters, on their own: ": "敵海域で単独で： ",
-      "Submarines on patrol: ": "哨戒中の潜水艦: ",
-      "Air: {0} squadron{1}, {2} aircraft, at ": "航空戦力：{0}飛行隊{1}、{2}機。所属： ",
-      "Depots: ": "補給拠点: ",
-      ". All supply now comes from them.": "。現在、すべての供給は彼らから来ています。",
-      "FRIENDLY FORCES": "友軍部隊",
-      "Hold what we have. No base is to be given up without a fight.": "私たちが持っているものを保持してください。 基地は戦わずして放棄されるべきではありません。",
-      "Keep the convoys moving: a fleet without fuel and weapons cannot fight.": "輸送船団を動かし続けてください。燃料と武器のない艦隊は戦うことができません。",
-      "Keep the supply lines open.": "供給ラインを開いたままにしてください。",
-      "Strike where the enemy is weak, and keep the fleet in being.": "敵の弱いところを攻撃し、艦隊を維持します。",
-      "Preserve the fleet, and hit the enemy where the line is thin.": "艦隊を温存し、戦列の薄い敵を攻撃します。",
+      "No enemy submarine is held. Their absence from the plot means nothing.": "敵潜水艦は未探知。地図上に表示がなくとも、不在とは判断できない。",
+      "No enemy surface force is at sea.": "洋上に敵水上部隊なし。",
+      "ENEMY FORCES": "敵部隊",
+      "Carrier groups: ": "空母戦闘群：",
+      "Amphibious: ": "揚陸部隊：",
+      "Landing troops: ": "上陸兵力：",
+      "At sea: ": "洋上：",
+      "Left behind the enemy's lines: ": "敵戦線後方の部隊：",
+      "In enemy waters, on their own: ": "敵海域で単独行動中の部隊：",
+      "Submarines on patrol: ": "哨戒中の潜水艦：",
+      "Air: {0} squadron{1}, {2} aircraft, at ": "航空戦力：{0}個飛行隊{1}、計{2}機。配備先：",
+      "Depots: ": "補給拠点：",
+      ". All supply now comes from them.": "。現在の補給は、すべてこれらの拠点に依存する。",
+      "FRIENDLY FORCES": "味方部隊",
+      "Hold what we have. No base is to be given up without a fight.": "現有拠点を保持せよ。戦闘を経ずに基地を放棄してはならない。",
+      "Keep the convoys moving: a fleet without fuel and weapons cannot fight.": "輸送船団の運航を維持せよ。燃料と兵器を欠く艦隊は戦闘を継続できない。",
+      "Keep the supply lines open.": "補給路を確保せよ。",
+      "Strike where the enemy is weak, and keep the fleet in being.": "敵の弱点を攻撃し、艦隊戦力を維持せよ。",
+      "Preserve the fleet, and hit the enemy where the line is thin.": "艦隊を保全し、敵の防御が薄い箇所を攻撃せよ。",
       "COMMANDER'S INTENT": "指揮官の意図",
       "COMMAND AND SIGNAL": "指揮・通信",
       "Admiralty orders follow by separate message.": "司令部の命令は別電で送る。",
       "Tasking from the Admiralty to follow.": "司令部からの任務指示は追って送る。",
-      "Contact reports by FLASH precedence; losses and battle damage by IMMEDIATE.": "接触報告は至急、損失と戦闘損傷は緊急の優先度で報告せよ。"
+      "Contact reports by FLASH precedence; losses and battle damage by IMMEDIATE.": "接触報告は至急、損失と戦闘損傷は緊急の優先度で報告せよ。",
+      "airfield": "航空基地",
+      "; ": "、",
+      ".": "。",
+      ". ": "。"
     },
     "DynamicCampaignMod.Core.Sim.Story/<>c__DisplayClass17_0::<BuildOpening>g__Place|11(DynamicCampaignMod.Core.State.TaskForce)": {
-      "at ": "所在：",
-      "at sea, ": "洋上、 "
+      "at ": "在港 ",
+      "at sea, ": "洋上 "
     },
     "DynamicCampaignMod.Core.Sim.Story/<>c__DisplayClass17_0::<BuildOpening>b__21(System.Linq.IGrouping`2<System.String,DynamicCampaignMod.Core.State.GroundUnit>)": {
       "{0} battalion{1} at {2}": "{2}に{0}個大隊{1}",
@@ -7774,6 +7779,25 @@
     },
     "DynamicCampaignMod.Core.Sim.ContactBriefing/<>c::<Composition>b__10_4(System.Linq.IGrouping`2<System.String,System.String>)": {
       "{0} {1}": "{1}（×{0}）"
+    },
+    "DynamicCampaignMod.Core.Sim.Story/<>c__DisplayClass17_0::<BuildOpening>b__10(System.ValueTuple`3<DynamicCampaignMod.Core.Data.InvasionDefinition,DynamicCampaignMod.Core.State.TaskForce,DynamicCampaignMod.Core.Data.BaseDefinition>)": {
+      " (": "（",
+      "), ": "）："
+    },
+    "DynamicCampaignMod.Core.Sim.Story/<>c__DisplayClass17_0::<BuildOpening>b__17(DynamicCampaignMod.Core.State.TaskForce)": {
+      " ": "："
+    },
+    "DynamicCampaignMod.Core.Sim.Story/<>c__DisplayClass17_0::<BuildOpening>b__18(DynamicCampaignMod.Core.State.TaskForce)": {
+      " ": "："
+    },
+    "DynamicCampaignMod.Core.Sim.Story/<>c__DisplayClass17_0::<BuildOpening>b__23(DynamicCampaignMod.Core.State.TaskForce)": {
+      ", ": "："
+    },
+    "DynamicCampaignMod.Core.Sim.Story/<>c__DisplayClass17_0::<BuildOpening>b__26(DynamicCampaignMod.Core.State.TaskForce)": {
+      ", ": "："
+    },
+    "DynamicCampaignMod.Core.Sim.Story/<>c__DisplayClass17_0::<BuildOpening>b__27(DynamicCampaignMod.Core.State.TaskForce)": {
+      ", ": "："
     }
   },
   "campaign": {
@@ -7970,7 +7994,7 @@
     "story.opening": {
       "The Soviet Union and the People's Republic of China opened hostilities without warning some weeks ago. In a short campaign they have overrun Taiwan, South Korea, the Ryukyu Islands, the Philippines, Singapore, Malaysia and the Indonesian islands.": "ソビエト連邦と中華人民共和国は数週間前、警告なく戦端を開いた。短期間の作戦で台湾、韓国、琉球列島、フィリピン、シンガポール、マレーシア、インドネシアの島々を制圧した。",
       "The north is China's: Chinese forces hold Taiwan, the Ryukyus and Korea, and Chinese fighters fly from Ching Chuan Kang. The south is the Soviets': staging through Cam Ranh Bay, they hold the Philippines, Singapore, Malaysia and Indonesia, their fighters fly from Clark and their naval bombers from Tengah.": "北部は中国の支配下にある。中国軍は台湾、琉球列島、朝鮮半島を占領し、戦闘機は清泉崗から出撃している。南部はソ連の支配下にある。カムラン湾を前進拠点としてフィリピン、シンガポール、マレーシア、インドネシアを占領し、戦闘機はクラーク、海軍爆撃機はテンガを拠点としている。",
-      "Seventh Fleet has fallen back to Darwin and east into the Pacific. Midway's group is at sea off southern Kyushu, half a day's steaming from Sasebo; the Japanese flotillas lie at Yokosuka, Sasebo, Maizuru and Kure.": "第7艦隊はダーウィンと、その東の太平洋へ後退した。ミッドウェイ群は九州南部沖を航行中で、佐世保まで約半日。日本の護衛隊群は横須賀、佐世保、舞鶴、呉にいる。",
+      "Seventh Fleet has fallen back to Darwin and east into the Pacific. Midway's group is at sea off southern Kyushu, half a day's steaming from Sasebo; the Japanese flotillas lie at Yokosuka, Sasebo, Maizuru and Kure.": "第7艦隊はダーウィンと、その東の太平洋へ後退した。ミッドウェイ空母戦闘群は九州南部沖を航行中で、佐世保まで約半日。日本の護衛隊群は横須賀、佐世保、舞鶴、呉にいる。",
       "Supply now comes the long way: across the central Pacific from Pearl Harbor, and up from Sydney.": "補給は遠路を通る。真珠湾から太平洋中央部を横断し、シドニーから北上して届く。",
       "The enemy is on a war footing. About two thirds of the enemy fleets are believed at sea; the rest lie in Vladivostok, Petropavlovsk and the Chinese ports.": "敵は戦時態勢にある。艦隊の約3分の2が出航中と推定され、残りはウラジオストク、ペトロパブロフスク、中国の港にいる。",
       "Enemy submarines are believed across our supply lanes in the central Pacific, between Hawaii, Guam and Japan. Treat every convoy route as threatened.": "ハワイ、グアム、日本を結ぶ太平洋中央部の補給路には、敵潜水艦が待ち伏せしていると推定される。すべての船団航路に脅威があるものとして行動せよ。",
