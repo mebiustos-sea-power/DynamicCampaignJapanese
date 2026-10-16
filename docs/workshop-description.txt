@@ -1,10 +1,10 @@
 Dynamic Campaign Mod 日本語化
 
 「Bungalow's Dynamic Campaign」のキャンペーン文章やUI表示を日本語化するMODです。
-対応する元MODのバージョンは0.24.3です。一部の個艦名・艦級名は英語表記のままです。
+元MOD 0.25.0の従来の太平洋キャンペーン（DCM Pacific 1985: Island by Island）と共通UIに対応します。新しいキャンペーンの文章は対象外です。
 
 必要なMOD
-・Bungalow's Dynamic Campaign 0.24.3（作者：Bungalow）
+・Bungalow's Dynamic Campaign（作者：Bungalow）
 https://steamcommunity.com/sharedfiles/filedetails/?id=3813157776
 ・Anchor Chain 1.1.0
 https://steamcommunity.com/sharedfiles/filedetails/?id=3380210757

@@ -55,4 +55,4 @@ Windows版の `dotnet.exe` をPATHから探します。見つからない場合�
 - `tools`：ビルド・比較検証用ツール
 - `docs`：Workshop説明文と開発文書
 
-比較検証には別途保管した基準データが必要です。実施条件、検証内容、ゲーム上での確認手順は [docs/verification.md](docs/verification.md) を参照してください。
+検証の実施条件、検証内容、ゲーム上での確認手順は [docs/verification.md](docs/verification.md) を参照してください。

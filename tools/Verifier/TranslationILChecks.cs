@@ -95,4 +95,44 @@ internal static class TranslationILChecks
         }
         return result;
     }
+    public static MethodInfo Compile(MethodBase method, OriginalModIntegration? integration,
+        Func<CodeInstruction[], CodeInstruction[]>? rewrite = null, Type? returnType = null, Type[]? parameterTypes = null)
+    {
+        var parameters = method.GetParameters().Select(parameter => parameter.ParameterType);
+        if (!method.IsStatic) parameters = new[] { method.DeclaringType!.IsValueType ? method.DeclaringType.MakeByRefType() : method.DeclaringType }.Concat(parameters);
+        var result = new DynamicMethod("TranslatedBehaviorFixture", returnType ?? (method is MethodInfo function ? function.ReturnType : typeof(void)), parameterTypes ?? parameters.ToArray(), method.Module, true);
+        var generator = result.GetILGenerator();
+        foreach (var local in method.GetMethodBody()!.LocalVariables) generator.DeclareLocal(local.LocalType);
+        var code = TranslationILChecks.Read(method, integration).ToArray();
+        if (rewrite != null) code = rewrite(code);
+        var labels = code.SelectMany(instruction => Metadata(instruction, "labels").Cast<Label>()).Distinct().ToDictionary(label => label, _ => generator.DefineLabel());
+        foreach (var instruction in code)
+        {
+            if (Metadata(instruction, "blocks").Count != 0) throw new InvalidOperationException("Behavior fixture requires an exception-handler emitter.");
+            foreach (var label in Metadata(instruction, "labels").Cast<Label>()) generator.MarkLabel(labels[label]);
+            switch (instruction.operand)
+            {
+                case null: generator.Emit(instruction.opcode); break;
+                case string text: generator.Emit(instruction.opcode, text); break;
+                case Type type: generator.Emit(instruction.opcode, type); break;
+                case FieldInfo field: generator.Emit(instruction.opcode, field); break;
+                case MethodInfo call: generator.Emit(instruction.opcode, call); break;
+                case ConstructorInfo constructor: generator.Emit(instruction.opcode, constructor); break;
+                case Label label: generator.Emit(instruction.opcode, labels[label]); break;
+                case Label[] targets: generator.Emit(instruction.opcode, targets.Select(target => labels[target]).ToArray()); break;
+                case int index when instruction.opcode.OperandType == OperandType.ShortInlineVar: generator.Emit(instruction.opcode, checked((byte)index)); break;
+                case int index when instruction.opcode.OperandType == OperandType.InlineVar: generator.Emit(instruction.opcode, checked((short)index)); break;
+                case int value: generator.Emit(instruction.opcode, value); break;
+                case sbyte value: generator.Emit(instruction.opcode, value); break;
+                case byte value: generator.Emit(instruction.opcode, value); break;
+                case long value: generator.Emit(instruction.opcode, value); break;
+                case float value: generator.Emit(instruction.opcode, value); break;
+                case double value: generator.Emit(instruction.opcode, value); break;
+                default: throw new InvalidOperationException("Unexpected behavior fixture instruction: " + instruction);
+            }
+        }
+        return result;
+    }
+
+    private static IList Metadata(CodeInstruction instruction, string name) => (IList)typeof(CodeInstruction).GetField(name)!.GetValue(instruction)!;
 }

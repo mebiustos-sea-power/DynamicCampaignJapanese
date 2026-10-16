@@ -9,7 +9,7 @@ namespace DynamicCampaignJapanese;
 
 public static class AircraftQuantityTranslation
 {
-    public const string Target = "DynamicCampaignMod.UI.Details.TaskForceDetailsViewModel/<>c__DisplayClass105_0::<AirGroupText>g__Count|2(System.ValueTuple`2<System.String,System.Int32>)";
+    public const string Target = "DynamicCampaignMod.UI.Details.TaskForceDetailsViewModel/<>c__DisplayClass107_0::<AirGroupText>g__Count|2(System.ValueTuple`2<System.String,System.Int32>)";
     public const string Template = "{0} {1}";
 
     public static void TranslateIL(ILContext context, MethodBase original, TranslationCatalog catalog, Action<string>? logWarning = null)

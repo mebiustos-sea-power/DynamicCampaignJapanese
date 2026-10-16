@@ -18,6 +18,10 @@ public sealed class CampaignTranslator
         TranslateRows(root["sides"], "sides", "name", "hq", "command");
         TranslateRows(root["bases"], "bases", "name");
         TranslateRows(root["labels"], "labels", "text");
+        if (root["texts"] is JObject texts)
+        foreach (var text in texts.Properties())
+            if (text.Value.Type == JTokenType.String)
+                text.Value = catalog.CampaignText("texts", (string)text.Value!);
 
         var renamed = new Dictionary<string, string>(StringComparer.Ordinal);
         if (root["forces"] is JArray forces)

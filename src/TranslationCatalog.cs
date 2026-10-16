@@ -11,6 +11,7 @@ public sealed class TranslationCatalog
     public IReadOnlyDictionary<string, string> Strings { get; }
     public IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> Methods { get; }
     public IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> Campaign { get; }
+    public IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> Display { get; }
 
     private TranslationCatalog(JObject data)
     {
@@ -18,6 +19,7 @@ public sealed class TranslationCatalog
         Strings = Dictionary(Required(data, "strings"));
         Methods = Groups(Required(data, "methods"));
         Campaign = Groups(Required(data, "campaign"));
+        Display = data["display"] == null ? new Dictionary<string, IReadOnlyDictionary<string, string>>(StringComparer.Ordinal) : Groups(Required(data, "display"));
     }
 
     public static TranslationCatalog Load(string path)
@@ -34,6 +36,9 @@ public sealed class TranslationCatalog
         return Campaign.TryGetValue(group, out var dictionary) && dictionary.TryGetValue(source, out var translated)
             ? translated : source;
     }
+
+    public string DisplayText(string group, string source) =>
+        Display.TryGetValue(group, out var dictionary) && dictionary.TryGetValue(source, out var translated) ? translated : source;
 
     private static JObject Required(JObject data, string key)
     {

@@ -36,7 +36,8 @@ public sealed class OriginalModIntegration
             .Where(method => method.GetMethodBody() != null).ToDictionary(MethodIdentity.Of, StringComparer.Ordinal);
         var signatures = new HashSet<string>(catalog.Methods.Keys, StringComparer.Ordinal)
         {
-            XamlLoad, XamlParse, CampaignLoad
+            XamlLoad, XamlParse, CampaignLoad, BriefingTextCompatibility.Parse, BriefingTextCompatibility.IsOpening, BriefingTextCompatibility.Sections, BriefingTextCompatibility.OrderLines, BattleReportDisplay.Target,
+            InternalNameCompatibility.Detachment, InternalNameCompatibility.Reroute, InternalNameCompatibility.Scattered
         };
         var plan = new List<MethodBase>();
         foreach (var signature in signatures.OrderBy(value => value, StringComparer.Ordinal))
@@ -79,6 +80,9 @@ public sealed class OriginalModIntegration
         catalog.Methods.TryGetValue(identity, out var literals);
         var isMarkup = identity == XamlLoad || identity == XamlParse;
         var isCampaign = identity == CampaignLoad;
+        BriefingTextCompatibility.TranslateIL(context, original);
+        InternalNameCompatibility.TranslateIL(context, original);
+        BattleReportDisplay.TranslateIL(context, original);
         AircraftMessageTranslation.TranslateIL(context, original, catalog, logWarning);
         AircraftQuantityTranslation.TranslateIL(context, original, catalog, logWarning);
         foreach (var instruction in context.Body.Instructions.ToArray())
@@ -107,6 +111,8 @@ public sealed class OriginalModIntegration
 
     public static string AircraftQuantity(string count, string ignoredSeparator, string name) =>
         string.Format(Active().catalog.Methods[AircraftQuantityTranslation.Target][AircraftQuantityTranslation.Template], count, name);
+
+    public static string BattleOutcome(string value) => Active().catalog.DisplayText("battleOutcome", value);
 
     public static string TranslateMarkup(string value) => Active().markup.Translate(value);
     public static string ReadCampaign(string path) => Active().campaign.Translate(File.ReadAllText(path));

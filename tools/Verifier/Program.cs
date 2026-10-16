@@ -23,7 +23,9 @@ internal static class Program
         Console.OutputEncoding = new System.Text.UTF8Encoding(false);
         try
         {
-            if (arguments.Length != 5) throw new ArgumentException("Pass the project, Sea Power, Anchor Chain, original mod and baseline directories.");
+            var current = arguments.Length == 6 && arguments[5] == "--current";
+            var messagesOnly = arguments.Length == 6 && arguments[5] == "--message-behavior";
+            if (arguments.Length != 5 && !current && !messagesOnly) throw new ArgumentException("Pass the project, Sea Power, Anchor Chain, original mod and baseline directories; optionally append --current.");
             var root = Path.GetFullPath(arguments[0]);
             Game = Path.GetFullPath(arguments[1]);
             AnchorChainDirectory = Path.GetFullPath(arguments[2]);
@@ -35,12 +37,28 @@ internal static class Program
             var catalog = TranslationCatalog.Load(Path.Combine(root, "localization", "translation-data.json"));
             var integration = new OriginalModIntegration(catalog);
             var original = AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.Combine(originalDirectory, "DynamicCampaignMod.dll"));
+            if (messagesOnly)
+            {
+                var messageReport = MessageBehaviorChecks.Verify(original, integration, Errors);
+                messageReport["uiState"] = UiStateBehaviorChecks.Verify(original, integration, catalog, Errors);
+                messageReport["errors"] = JArray.FromObject(Errors);
+                messageReport["passed"] = Errors.Count == 0;
+                Console.WriteLine(messageReport.ToString(Formatting.Indented));
+                return Errors.Count == 0 ? 0 : 1;
+            }
             var gameAssembly = AppDomain.CurrentDomain.GetAssemblies().Single(assembly => assembly.GetName().Name == "Seapower-Scripts");
             var shipNames = ShipNameChecks.LoadSource(Game, gameAssembly, Errors);
             var campaignShipNames = CampaignShipNames.Load(Path.Combine(root, "localization", "campaign-ship-names.json"));
             var shipDisplays = ShipNameChecks.VerifyDisplay(shipNames.Translations, campaignShipNames, original, Errors);
             var campaignShipDisplays = CampaignShipNameChecks.Verify(root, original, Errors);
             var loadoutDisplays = AirLoadoutChecks.Verify(Game, gameAssembly, original, Errors);
+            if (current) return CurrentModChecks.Run(root, originalDirectory, baselineDirectory, original, integration, catalog,
+                shipNames.Translations, campaignShipNames, new JObject
+                {
+                    ["startupChecks"] = startupChecks, ["modActivationChecks"] = activationChecks,
+                    ["shipDisplayChecks"] = shipDisplays, ["campaignShipDisplayChecks"] = campaignShipDisplays,
+                    ["loadoutDisplayChecks"] = loadoutDisplays
+                }, Errors);
             var oldAssembly = Assembly.LoadFile(Path.Combine(baselineDirectory, "installed-package", "DynamicCampaignJapanese.dll"));
             AssemblyLoadContext.GetLoadContext(oldAssembly)!.Resolving += ResolveGameAssembly;
             var legacy = oldAssembly.GetType("BungalowChinese.Runtime", true)!;

@@ -17,7 +17,7 @@ internal static class QuantityDisplayChecks
     private const BindingFlags All = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
     private const string AirBase = "DynamicCampaignMod.UI.AirBase.AirBaseViewModel";
     private const string Carrier = "DynamicCampaignMod.UI.AirBase.CarrierAirViewModel";
-    private const string Capture = "DynamicCampaignMod.UI.Details.TaskForceDetailsViewModel/<>c__DisplayClass105_0";
+    private const string Capture = "DynamicCampaignMod.UI.Details.TaskForceDetailsViewModel/<>c__DisplayClass107_0";
     private static readonly string[] Targets =
     {
         AirBase + "::<UpdateLoadoutDetails>b__122_0(System.Collections.Generic.KeyValuePair`2<System.String,System.Int32>)",
@@ -84,7 +84,7 @@ internal static class QuantityDisplayChecks
                             .SequenceEqual(Metadata(translated[i], "blocks").Cast<ExceptionBlock>().Select(b => (b.blockType, b.catchType))))
                         errors.Add("Quantity display changed original control flow or data access: " + identity + " / " + i);
                 }
-                var output = Compile(method, integration);
+                var output = TranslationILChecks.Compile(method, integration);
                 object? instance = method.DeclaringType!.FullName!.Contains("DisplayClass", StringComparison.Ordinal) ? capture :
                     method.DeclaringType!.FullName == AirBase ? View(AirBase) : View(Carrier);
                 string Run(params object[] values) => (string)output.Invoke(null,
@@ -147,37 +147,6 @@ internal static class QuantityDisplayChecks
                 ["unrecognizedDisplayLoggedAndPreserved"] = warnings.Count == 1 };
         }
         finally { typeof(OriginalModIntegration).GetField("current", All)!.SetValue(null, previous); }
-    }
-
-    private static MethodInfo Compile(MethodInfo method, OriginalModIntegration integration)
-    {
-        var parameters = method.GetParameters().Select(parameter => parameter.ParameterType);
-        if (!method.IsStatic) parameters = new[] { method.DeclaringType! }.Concat(parameters);
-        var result = new DynamicMethod("TranslatedQuantityDisplay", method.ReturnType, parameters.ToArray(), method.DeclaringType!, true);
-        var generator = result.GetILGenerator();
-        foreach (var local in method.GetMethodBody()!.LocalVariables) generator.DeclareLocal(local.LocalType);
-        var code = TranslationILChecks.Read(method, integration).ToArray();
-        var labels = code.SelectMany(instruction => Metadata(instruction, "labels").Cast<Label>()).Distinct().ToDictionary(label => label, _ => generator.DefineLabel());
-        foreach (var instruction in code)
-        {
-            if (Metadata(instruction, "blocks").Count != 0) throw new InvalidOperationException("Quantity display fixture requires an exception-handler emitter.");
-            foreach (var label in Metadata(instruction, "labels").Cast<Label>()) generator.MarkLabel(labels[label]);
-            switch (instruction.operand)
-            {
-                case null: generator.Emit(instruction.opcode); break;
-                case string text: generator.Emit(instruction.opcode, text); break;
-                case Type type: generator.Emit(instruction.opcode, type); break;
-                case FieldInfo field: generator.Emit(instruction.opcode, field); break;
-                case MethodInfo call: generator.Emit(instruction.opcode, call); break;
-                case ConstructorInfo constructor: generator.Emit(instruction.opcode, constructor); break;
-                case Label label: generator.Emit(instruction.opcode, labels[label]); break;
-                case int index when instruction.opcode.OperandType == OperandType.ShortInlineVar: generator.Emit(instruction.opcode, checked((byte)index)); break;
-                case int index when instruction.opcode.OperandType == OperandType.InlineVar: generator.Emit(instruction.opcode, checked((short)index)); break;
-                case int value: generator.Emit(instruction.opcode, value); break;
-                default: throw new InvalidOperationException("Unexpected quantity display instruction: " + instruction);
-            }
-        }
-        return result;
     }
 
     private static void Set(object target, string name, object? value) => target.GetType().GetField(name, All)!.SetValue(target, value);

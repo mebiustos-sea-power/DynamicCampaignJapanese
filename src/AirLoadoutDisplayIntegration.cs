@@ -12,7 +12,7 @@ public sealed class AirLoadoutDisplayIntegration
     private const BindingFlags Declared = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly;
     private const string LoadoutType = "DynamicCampaignMod.Core.Data.LoadoutSpec";
     private const string PickerType = "DynamicCampaignMod.UI.AirBase.PickerItem";
-    private const string ShipyardLoadoutDisplay = "DynamicCampaignMod.UI.Strategy.ProcurementViewModel/<>c::<RefreshDetail>b__162_10(DynamicCampaignMod.Core.Data.LoadoutSpec)";
+    private const string ShipyardLoadoutDisplay = "DynamicCampaignMod.UI.Strategy.ProcurementViewModel/<>c::<RefreshDetail>b__165_9(DynamicCampaignMod.Core.Data.LoadoutSpec)";
     private static readonly string[] Views =
     {
         "DynamicCampaignMod.UI.AirBase.AirBaseViewModel",
