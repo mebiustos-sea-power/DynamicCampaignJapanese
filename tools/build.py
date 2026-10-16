@@ -20,13 +20,18 @@ def main():
     shutil.copy2(binary, package / binary.name)
     for name in ('translation-data.json', 'campaign-ship-names.json'):
         shutil.copy2(ROOT / 'localization' / name, package / name)
+    for relative in json.loads((ROOT / 'localization/translation-data.json').read_text(encoding='utf-8-sig')).get('campaignFiles', {}).values():
+        destination = package / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / 'localization' / relative, destination)
     for path in (ROOT / 'package').iterdir():
         if path.is_file():
             shutil.copy2(path, package / path.name)
     archive = ARTIFACTS / 'DynamicCampaignJapanese.zip'
     with zipfile.ZipFile(archive, 'w', compression=zipfile.ZIP_DEFLATED) as target:
-        for path in sorted(package.iterdir()):
-            target.write(path, 'DynamicCampaignJapanese/' + path.name)
+        for path in sorted(package.rglob('*')):
+            if path.is_file():
+                target.write(path, 'DynamicCampaignJapanese/' + path.relative_to(package).as_posix())
     print(json.dumps({'build': 'passed', 'dll': str(binary), 'package': str(package), 'zip': str(archive)}, ensure_ascii=False))
 
 

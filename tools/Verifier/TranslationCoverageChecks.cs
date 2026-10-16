@@ -75,22 +75,34 @@ internal static class TranslationCoverageChecks
         var unusedMarkup = catalog.Strings.Keys.Where(s => !markupSources.Contains(s)).ToArray();
         var campaignSources = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
         var campaignMissing = new JArray();
+        var scopedSources = new Dictionary<string, Dictionary<string, HashSet<string>>>(StringComparer.Ordinal);
+        var warPlanRegions = new HashSet<string>(StringComparer.Ordinal);
+        var checkedCampaigns = new JArray();
         var translatedTexts = 0;
         foreach (var file in Directory.EnumerateFiles(Path.Combine(originalDirectory, "dynamic_campaigns"), "campaign.json", SearchOption.AllDirectories))
         {
             var data = JObject.Parse(File.ReadAllText(file));
+            var id = (string)data["id"]!;
+            var ownSources = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
+            scopedSources.Add(id, ownSources);
             foreach (var field in CampaignFields(data))
             {
                 if (!campaignSources.TryGetValue(field.Group, out var values)) campaignSources.Add(field.Group, values = new HashSet<string>(StringComparer.Ordinal));
                 values.Add(field.Source);
+                if (!ownSources.TryGetValue(field.Group, out var own)) ownSources.Add(field.Group, own = new HashSet<string>(StringComparer.Ordinal));
+                own.Add(field.Source);
             }
-            if (new DirectoryInfo(Path.GetDirectoryName(file)!).Name != "east_asia_1985") continue;
+            if (data["warPlan"] is JArray plan)
+                foreach (var entry in plan)
+                    if ((string?)entry["name"] is string region) warPlanRegions.Add(region);
+            if (id != "bungalow.east_asia_1985" && !catalog.Campaigns.ContainsKey(id)) continue;
+            checkedCampaigns.Add(id);
             var translated = JObject.Parse(new CampaignTranslator(catalog).Translate(data.ToString()));
             foreach (var field in CampaignFields(data))
             {
                 if (!English(field.Source)) continue;
                 var output = (string?)translated.SelectToken(field.Path);
-                if (output == field.Source) campaignMissing.Add(new JObject { ["path"] = field.Path, ["source"] = field.Source });
+                if (output == field.Source) campaignMissing.Add(new JObject { ["campaign"] = id, ["path"] = field.Path, ["source"] = field.Source });
                 if (field.Group != "texts" || output == field.Source) continue;
                 translatedTexts++;
                 string Placeholders(string value) => string.Join("|", Regex.Matches(value, @"\{[A-Za-z_][A-Za-z0-9_]*\}").Cast<Match>().Select(m => m.Value).OrderBy(s => s));
@@ -100,22 +112,27 @@ internal static class TranslationCoverageChecks
         var unusedCampaign = new JArray(catalog.Campaign.SelectMany(group => group.Value.Keys
             .Where(s => !campaignSources.TryGetValue(group.Key, out var values) || !values.Contains(s))
             .Select(s => new JObject { ["group"] = group.Key, ["source"] = s })));
+        foreach (var scoped in catalog.Campaigns.Values)
+            foreach (var group in scoped.Groups)
+                foreach (var source in group.Value.Keys)
+                    if (!scopedSources.TryGetValue(scoped.Id, out var groups) || !groups.TryGetValue(group.Key, out var values) || !values.Contains(source))
+                        unusedCampaign.Add(new JObject { ["campaign"] = scoped.Id, ["group"] = group.Key, ["source"] = source });
         var outcomeGetter = original.GetType("DynamicCampaignMod.Core.State.BattleReport", true)!.GetProperty("Outcome")!.GetMethod!;
         var outcomeSources = ((MethodDefinition)module.LookupToken(outcomeGetter.MetadataToken)).Body.Instructions
             .Where(i => i.OpCode == OpCodes.Ldstr).Select(i => (string)i.Operand).ToHashSet(StringComparer.Ordinal);
-        var unusedDisplay = new JArray(catalog.Display.SelectMany(group => group.Value.Keys.Where(source => group.Key != "battleOutcome" || !outcomeSources.Contains(source))
+        var unusedDisplay = new JArray(catalog.Display.SelectMany(group => group.Value.Keys.Where(source => group.Key == "battleOutcome" ? !outcomeSources.Contains(source) : group.Key != "warPlanRegion" || !warPlanRegions.Contains(source))
             .Select(source => new JObject { ["group"] = group.Key, ["source"] = source })));
         if (unusedDisplay.Count != 0) errors.Add("Unused display translation entries: " + unusedDisplay.Count);
         if (unusedMarkup.Length != 0) errors.Add("Unused XAML translation entries: " + unusedMarkup.Length);
         if (unusedMethods.Count != 0) errors.Add("Unused method translation entries: " + unusedMethods.Count);
         if (unusedCampaign.Count != 0) errors.Add("Unused campaign translation entries: " + unusedCampaign.Count);
         if (missingMarkup.Count != 0) errors.Add("Untranslated XAML display attributes: " + missingMarkup.Count);
-        if (campaignMissing.Count != 0) errors.Add("Untranslated existing-campaign display fields: " + campaignMissing.Count);
+        if (campaignMissing.Count != 0) errors.Add("Untranslated supported-campaign display fields: " + campaignMissing.Count);
         File.WriteAllText(Path.Combine(root, "artifacts", "method-literal-review.json"), review.ToString(Formatting.Indented));
         File.WriteAllText(Path.Combine(root, "artifacts", "comparison-literal-review.json"), decisionReview.ToString(Formatting.Indented));
         return new JObject { ["unusedMarkup"] = JArray.FromObject(unusedMarkup), ["unusedMethods"] = unusedMethods,
             ["unusedCampaign"] = unusedCampaign, ["unusedDisplay"] = unusedDisplay, ["untranslatedMarkup"] = missingMarkup, ["untranslatedCampaign"] = campaignMissing,
-            ["translatedCampaignTexts"] = translatedTexts,
+            ["translatedCampaignTexts"] = translatedTexts, ["checkedCampaigns"] = checkedCampaigns,
             ["methodLiteralReviewCandidates"] = review.Count, ["methodLiteralReviewFile"] = "artifacts/method-literal-review.json",
             ["methodReviewRequiresHumanClassification"] = true,
             ["comparisonReviewCandidates"] = decisionReview.Count, ["comparisonReviewFile"] = "artifacts/comparison-literal-review.json",

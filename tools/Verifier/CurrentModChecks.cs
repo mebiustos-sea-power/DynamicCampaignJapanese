@@ -59,6 +59,17 @@ internal static class CurrentModChecks
         var source = File.ReadAllText(campaignPath);
         var translated = new CampaignTranslator(catalog).Translate(source);
         report["campaignChecks"] = VerifyCampaign(source, translated, errors);
+        var additionalCampaigns = new JObject();
+        foreach (var file in Directory.EnumerateFiles(Path.Combine(originalDirectory, "dynamic_campaigns"), "campaign.json", SearchOption.AllDirectories))
+        {
+            var input = File.ReadAllText(file);
+            var id = (string)JObject.Parse(input)["id"]!;
+            if (id == "bungalow.east_asia_1985" || !catalog.Campaigns.ContainsKey(id)) continue;
+            additionalCampaigns[id] = VerifyCampaign(input, new CampaignTranslator(catalog).Translate(input), errors);
+        }
+        report["additionalCampaignChecks"] = additionalCampaigns;
+        report["campaignFileChecks"] = CampaignFileChecks.Verify(errors);
+        report["warPlanDisplayChecks"] = WarPlanDisplayChecks.Verify(original, integration, catalog, originalDirectory, errors);
         report["identifierBranchChecks"] = IdentifierBranchChecks.Verify(original, integration, catalog, source, errors);
         report["messageBehaviorChecks"] = MessageBehaviorChecks.Verify(original, integration, errors);
         report["uiStateBehaviorChecks"] = UiStateBehaviorChecks.Verify(original, integration, catalog, errors);
@@ -85,7 +96,7 @@ internal static class CurrentModChecks
         instructions.RemoveAll(i => i.Operand is MethodReference call &&
             (call.DeclaringType.FullName == typeof(InternalNameCompatibility).FullName ||
              call.DeclaringType.FullName == typeof(BriefingTextCompatibility).FullName ||
-             (call.DeclaringType.FullName == typeof(OriginalModIntegration).FullName && call.Name == nameof(OriginalModIntegration.BattleOutcome))));
+             (call.DeclaringType.FullName == typeof(OriginalModIntegration).FullName && call.Name is nameof(OriginalModIntegration.BattleOutcome) or nameof(OriginalModIntegration.WarPlanRegion))));
         string Operand(object? value) => value switch
         {
             Instruction instruction => "@" + instructions.IndexOf(instruction),

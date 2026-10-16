@@ -1,7 +1,7 @@
 Dynamic Campaign Mod 日本語化
 
 「Bungalow's Dynamic Campaign」のキャンペーン文章やUI表示を日本語化するMODです。
-元MOD 0.25.0の従来の太平洋キャンペーン（DCM Pacific 1985: Island by Island）と共通UIに対応します。新しいキャンペーンの文章は対象外です。
+元MOD 0.25.0の太平洋キャンペーン2本（Island by Island / Red Tide）、大西洋キャンペーン（Hold the Gap）と共通UIに対応します。
 
 必要なMOD
 ・Bungalow's Dynamic Campaign（作者：Bungalow）
